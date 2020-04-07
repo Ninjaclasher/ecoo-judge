@@ -173,10 +173,6 @@ class Profile(models.Model):
         return self.get_user_css_class(self.display_rank, self.rating)
 
     class Meta:
-        permissions = (
-            ('test_site', 'Shows in-progress development stuff'),
-            ('view_name', "View user's real name"),
-        )
         verbose_name = _('user profile')
         verbose_name_plural = _('user profiles')
 
