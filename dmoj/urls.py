@@ -16,7 +16,7 @@ from judge.forms import CustomAuthenticationForm
 from judge.sitemap import BlogPostSitemap, ContestSitemap, HomePageSitemap, OrganizationSitemap, ProblemSitemap, \
     SolutionSitemap, UrlSitemap, UserSitemap
 from judge.views import TitledTemplateView, blog, contests, language, license, mailgun, organization, \
-    preview, problem, problem_manage, ranked_submission, register, stats, status, submission, tasks, ticket, \
+    preview, problem, problem_manage, ranked_submission, register, status, submission, tasks, ticket, \
     user, widgets
 from judge.views.problem_data import ProblemDataView, ProblemSubmissionDiff, \
     problem_data_file, problem_init_view
@@ -290,16 +290,6 @@ urlpatterns = [
         url(r'^problems/atom/$', AtomProblemFeed(), name='problem_atom'),
         url(r'^blog/rss/$', BlogFeed(), name='blog_rss'),
         url(r'^blog/atom/$', AtomBlogFeed(), name='blog_atom'),
-    ])),
-
-    url(r'^stats/', include([
-        url('^language/', include([
-            url('^$', stats.language, name='language_stats'),
-            url('^data/all/$', stats.language_data, name='language_stats_data_all'),
-            url('^data/ac/$', stats.ac_language_data, name='language_stats_data_ac'),
-            url('^data/status/$', stats.status_data, name='stats_data_status'),
-            url('^data/ac_rate/$', stats.ac_rate, name='language_stats_data_ac_rate'),
-        ])),
     ])),
 
     url(r'^tickets/', include([
