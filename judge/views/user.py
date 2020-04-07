@@ -233,8 +233,6 @@ class UserPerformancePointsAjax(UserProblemsPage):
 @login_required
 def edit_profile(request):
     profile = Profile.objects.get(user=request.user)
-    if profile.mute:
-        raise Http404()
     if request.method == 'POST':
         form = ProfileForm(request.POST, instance=profile, user=request.user)
         if form.is_valid():

@@ -49,7 +49,7 @@ class ProfileAdmin(NoBatchDeleteMixin, VersionAdmin):
     fieldsets = (
         (None, {'fields': ('user', 'display_rank')}),
         (_('User Settings'), {'fields': ('organizations', 'timezone', 'language', 'ace_theme', 'math_engine')}),
-        (_('Administration'), {'fields': ('is_external_user', 'mute', 'is_unlisted',
+        (_('Administration'), {'fields': ('is_external_user', 'is_unlisted',
                                           'last_access', 'ip', 'current_contest', 'notes')}),
         (_('Text Fields'), {'fields': ('about', 'user_script')}),
     )

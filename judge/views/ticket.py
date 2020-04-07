@@ -46,8 +46,6 @@ class TicketForm(forms.Form):
     def clean(self):
         if self.request is not None and self.request.user.is_authenticated:
             profile = self.request.profile
-            if profile.mute:
-                raise ValidationError(_('Your part is silent, little toad.'))
             if profile.is_external_user and \
                 Ticket.objects.filter(user=profile,
                                       time__gte=timezone.now() - timezone.timedelta(minutes=10)).exists():

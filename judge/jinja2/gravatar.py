@@ -12,7 +12,7 @@ from . import registry
 def gravatar(email, size=80, default=None):
     if isinstance(email, Profile):
         if default is None:
-            default = email.mute
+            default = False
         email = email.user.email
     elif isinstance(email, AbstractUser):
         email = email.email
