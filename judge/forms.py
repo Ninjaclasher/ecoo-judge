@@ -128,22 +128,6 @@ class NoAutoCompleteCharField(forms.CharField):
         return attrs
 
 
-class TOTPForm(Form):
-    TOLERANCE = settings.DMOJ_TOTP_TOLERANCE_HALF_MINUTES
-
-    totp_token = NoAutoCompleteCharField(validators=[
-        RegexValidator('^[0-9]{6}$', _('Two Factor Authentication tokens must be 6 decimal digits.')),
-    ])
-
-    def __init__(self, *args, **kwargs):
-        self.totp_key = kwargs.pop('totp_key')
-        super(TOTPForm, self).__init__(*args, **kwargs)
-
-    def clean_totp_token(self):
-        if not pyotp.TOTP(self.totp_key).verify(self.cleaned_data['totp_token'], valid_window=self.TOLERANCE):
-            raise ValidationError(_('Invalid Two Factor Authentication token.'))
-
-
 class ProblemCloneForm(Form):
     code = CharField(max_length=20, validators=[RegexValidator('^[a-z0-9]+$', _('Problem code must be ^[a-z0-9]+$'))])
 

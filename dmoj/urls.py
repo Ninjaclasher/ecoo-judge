@@ -16,7 +16,7 @@ from judge.forms import CustomAuthenticationForm
 from judge.sitemap import BlogPostSitemap, ContestSitemap, HomePageSitemap, OrganizationSitemap, ProblemSitemap, \
     SolutionSitemap, UrlSitemap, UserSitemap
 from judge.views import TitledTemplateView, blog, comment, contests, language, license, mailgun, organization, \
-    preview, problem, problem_manage, ranked_submission, register, stats, status, submission, tasks, ticket, totp, \
+    preview, problem, problem_manage, ranked_submission, register, stats, status, submission, tasks, ticket, \
     user, widgets
 from judge.views.problem_data import ProblemDataView, ProblemSubmissionDiff, \
     problem_data_file, problem_init_view
@@ -80,10 +80,6 @@ register_patterns = [
         template_name='registration/password_reset_done.html',
     ), name='password_reset_done'),
     url(r'^social/error/$', register.social_auth_error, name='social_auth_error'),
-
-    url(r'^2fa/$', totp.TOTPLoginView.as_view(), name='login_2fa'),
-    url(r'^2fa/enable/$', totp.TOTPEnableView.as_view(), name='enable_2fa'),
-    url(r'^2fa/disable/$', totp.TOTPDisableView.as_view(), name='disable_2fa'),
 ]
 
 

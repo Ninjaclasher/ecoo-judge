@@ -109,12 +109,6 @@ class Profile(models.Model):
     math_engine = models.CharField(verbose_name=_('math engine'), choices=MATH_ENGINES_CHOICES, max_length=4,
                                    default=settings.MATHOID_DEFAULT_TYPE,
                                    help_text=_('the rendering engine used to render math'))
-    is_totp_enabled = models.BooleanField(verbose_name=_('2FA enabled'), default=False,
-                                          help_text=_('check to enable TOTP-based two factor authentication'))
-    totp_key = EncryptedNullCharField(max_length=32, null=True, blank=True, verbose_name=_('TOTP key'),
-                                      help_text=_('32 character base32-encoded key for TOTP'),
-                                      validators=[RegexValidator('^$|^[A-Z2-7]{32}$',
-                                                                 _('TOTP key must be empty or base32'))])
     notes = models.TextField(verbose_name=_('internal notes'), null=True, blank=True,
                              help_text=_('Notes for administrators regarding this user.'))
     is_external_user = models.BooleanField(verbose_name=_('external user'), default=False,
@@ -187,7 +181,6 @@ class Profile(models.Model):
     class Meta:
         permissions = (
             ('test_site', 'Shows in-progress development stuff'),
-            ('totp', 'Edit TOTP settings'),
             ('view_name', "View user's real name"),
         )
         verbose_name = _('user profile')
