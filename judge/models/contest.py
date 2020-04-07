@@ -14,9 +14,8 @@ from judge import contest_format
 from judge.models.problem import Problem
 from judge.models.profile import Organization, Profile
 from judge.models.submission import Submission
-from judge.ratings import rate_contest
 
-__all__ = ['Contest', 'ContestTag', 'ContestParticipation', 'ContestProblem', 'ContestSubmission', 'Rating']
+__all__ = ['Contest', 'ContestTag', 'ContestParticipation', 'ContestProblem', 'ContestSubmission']
 
 
 class ContestTag(models.Model):
@@ -68,8 +67,6 @@ class Contest(models.Model):
     is_virtualable = models.BooleanField(verbose_name=_('virtualable'), default=True,
                                          help_text=_('Whether a user can virtually participate '
                                                      'in this contest or not.'))
-    is_rated = models.BooleanField(verbose_name=_('contest rated'), help_text=_('Whether this contest can be rated.'),
-                                   default=False)
     require_registration = models.BooleanField(verbose_name=_('require registration'), default=False,
                                                help_text=_('Whether the user must be registered before being '
                                                            'able to join the contest.'))
@@ -96,13 +93,6 @@ class Contest(models.Model):
     use_clarifications = models.BooleanField(verbose_name=_('no comments'),
                                              help_text=_("Use clarification system instead of comments."),
                                              default=True)
-    rating_floor = models.IntegerField(verbose_name=('rating floor'), help_text=_('Rating floor for contest'),
-                                       null=True, blank=True)
-    rating_ceiling = models.IntegerField(verbose_name=('rating ceiling'), help_text=_('Rating ceiling for contest'),
-                                         null=True, blank=True)
-    rate_all = models.BooleanField(verbose_name=_('rate all'), help_text=_('Rate all users who joined.'), default=False)
-    rate_exclude = models.ManyToManyField(Profile, verbose_name=_('exclude from ratings'), blank=True,
-                                          related_name='rate_exclude+')
     is_organization_private = models.BooleanField(verbose_name=_('completely private to organizations'),
                                                   help_text=_('Whether only specified organizations can view '
                                                               'and join this contest.'),
@@ -409,11 +399,6 @@ class Contest(models.Model):
             queryset = queryset.filter(filter)
         return queryset.distinct()
 
-    def rate(self):
-        Rating.objects.filter(contest__end_time__gte=self.end_time).delete()
-        for contest in Contest.objects.filter(is_rated=True, end_time__gte=self.end_time).order_by('end_time'):
-            rate_contest(contest)
-
     class Meta:
         permissions = (
             ('see_private_contest', _('See private contests')),
@@ -423,7 +408,6 @@ class Contest(models.Model):
             ('clone_contest', _('Clone contest')),
             ('contest_frozen_state', _('Change contest frozen state')),
             ('moss_contest', _('MOSS contest')),
-            ('contest_rating', _('Rate contests')),
             ('contest_access_code', _('Contest access codes')),
             ('create_private_contest', _('Create private contests')),
             ('change_contest_visibility', _('Change contest visibility')),
@@ -474,8 +458,6 @@ class ContestParticipation(models.Model):
     def set_disqualified(self, disqualified):
         self.is_disqualified = disqualified
         self.recompute_results()
-        if self.contest.is_rated and self.contest.ratings.exists():
-            self.contest.rate()
         if self.is_disqualified:
             if self.user.current_contest == self:
                 self.user.remove_contest()
@@ -584,22 +566,6 @@ class ContestSubmission(models.Model):
         )
         verbose_name = _('contest submission')
         verbose_name_plural = _('contest submissions')
-
-
-class Rating(models.Model):
-    user = models.ForeignKey(Profile, verbose_name=_('user'), related_name='ratings', on_delete=CASCADE)
-    contest = models.ForeignKey(Contest, verbose_name=_('contest'), related_name='ratings', on_delete=CASCADE)
-    participation = models.OneToOneField(ContestParticipation, verbose_name=_('participation'),
-                                         related_name='rating', on_delete=CASCADE)
-    rank = models.IntegerField(verbose_name=_('rank'))
-    rating = models.IntegerField(verbose_name=_('rating'))
-    volatility = models.IntegerField(verbose_name=_('volatility'))
-    last_rated = models.DateTimeField(db_index=True, verbose_name=_('last rated'))
-
-    class Meta:
-        unique_together = ('user', 'contest')
-        verbose_name = _('contest rating')
-        verbose_name_plural = _('contest ratings')
 
 
 class ContestMoss(models.Model):

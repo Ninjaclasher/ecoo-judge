@@ -1,5 +1,4 @@
 import itertools
-import json
 from datetime import datetime
 from operator import itemgetter
 
@@ -8,22 +7,19 @@ from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import redirect_to_login
 from django.db import transaction
-from django.db.models import Count, Max, Min
+from django.db.models import Max
 from django.http import Http404, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.formats import date_format
 from django.utils.functional import cached_property
-from django.utils.safestring import mark_safe
 from django.utils.translation import gettext as _, gettext_lazy
 from django.views.generic import DetailView, ListView, TemplateView
 from reversion import revisions
 
 from judge.forms import ProfileForm, newsletter_id
-from judge.models import Profile, Rating, Submission, Ticket
+from judge.models import Profile, Submission, Ticket
 from judge.performance_points import get_pp_breakdown
-from judge.ratings import rating_class, rating_progress
 from judge.utils.problems import contest_completed_ids, user_completed_ids
 from judge.utils.ranker import ranker
 from judge.utils.subscription import Subscription
@@ -93,20 +89,10 @@ class UserPage(TitleMixin, UserMixin, DetailView):
         context['hide_solved'] = int(self.hide_solved)
         context['authored'] = self.object.authored_problems.filter(is_public=True, is_organization_private=False) \
                                   .order_by('code')
-        rating = self.object.ratings.order_by('-contest__end_time')[:1]
-        context['rating'] = rating[0] if rating else None
-
         context['rank'] = Profile.objects.filter(
             is_external_user=False, is_unlisted=False, performance_points__gt=self.object.performance_points,
         ).count() + 1
 
-        if rating:
-            context['rating_rank'] = Profile.objects.filter(is_external_user=False, is_unlisted=False,
-                                                            rating__gt=self.object.rating).count() + 1
-            context['rated_users'] = Profile.objects.filter(is_external_user=False, is_unlisted=False,
-                                                            rating__isnull=False).count()
-        context.update(self.object.ratings.aggregate(min_rating=Min('rating'), max_rating=Max('rating'),
-                                                     contests=Count('contest')))
         return context
 
     def get(self, request, *args, **kwargs):
@@ -142,33 +128,6 @@ class UserDashboard(UserPage):
 
 class UserAboutPage(UserPage):
     template_name = 'user/user-about.html'
-
-    def get_context_data(self, **kwargs):
-        context = super(UserAboutPage, self).get_context_data(**kwargs)
-        ratings = context['ratings'] = self.object.ratings.order_by('-contest__end_time').select_related('contest') \
-            .defer('contest__description')
-
-        context['rating_data'] = mark_safe(json.dumps([{
-            'label': rating.contest.name,
-            'rating': rating.rating,
-            'ranking': rating.rank,
-            'link': reverse('contest_ranking', args=(rating.contest.key,)),
-            'timestamp': (rating.contest.end_time - EPOCH).total_seconds() * 1000,
-            'date': date_format(rating.contest.end_time, _('M j, Y, G:i')),
-            'class': rating_class(rating.rating),
-            'height': '%.3fem' % rating_progress(rating.rating),
-        } for rating in ratings]))
-
-        if ratings:
-            user_data = self.object.ratings.aggregate(Min('rating'), Max('rating'))
-            global_data = Rating.objects.aggregate(Min('rating'), Max('rating'))
-            min_ever, max_ever = global_data['rating__min'], global_data['rating__max']
-            min_user, max_user = user_data['rating__min'], user_data['rating__max']
-            delta = max_user - min_user
-            ratio = (max_ever - max_user) / (max_ever - min_ever) if max_ever != min_ever else 1.0
-            context['max_graph'] = max_user + ratio * delta
-            context['min_graph'] = min_user + ratio * delta - delta
-        return context
 
 
 class UserProblemsPage(UserPage):
@@ -275,14 +234,14 @@ class UserList(QueryStringSortMixin, DiggPaginatorMixin, TitleMixin, ListView):
     context_object_name = 'users'
     template_name = 'user/list.html'
     paginate_by = 100
-    all_sorts = frozenset(('points', 'problem_count', 'rating', 'performance_points'))
+    all_sorts = frozenset(('points', 'problem_count', 'performance_points'))
     default_desc = all_sorts
     default_sort = '-performance_points'
 
     def get_queryset(self):
         return (Profile.objects.filter(is_external_user=False, is_unlisted=False)
                 .order_by(self.order, 'id').select_related('user')
-                .only('display_rank', 'user__username', 'points', 'rating', 'performance_points',
+                .only('display_rank', 'user__username', 'points', 'performance_points',
                       'problem_count'))
 
     def get_context_data(self, **kwargs):

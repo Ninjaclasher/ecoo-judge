@@ -13,7 +13,6 @@ from sortedm2m.fields import SortedManyToManyField
 
 from judge.models.choices import ACE_THEMES, MATH_ENGINES_CHOICES, TIMEZONE
 from judge.models.runtime import Language
-from judge.ratings import rating_class
 
 __all__ = ['Organization', 'Profile', 'OrganizationRequest']
 
@@ -97,7 +96,6 @@ class Profile(models.Model):
                                              ('admin', 'Admin')))
     is_unlisted = models.BooleanField(verbose_name=_('unlisted user'), help_text=_('User will not be ranked.'),
                                       default=False)
-    rating = models.IntegerField(null=True, default=None)
     current_contest = models.OneToOneField('ContestParticipation', verbose_name=_('current contest'),
                                            null=True, blank=True, related_name='+', on_delete=models.SET_NULL)
     math_engine = models.CharField(verbose_name=_('math engine'), choices=MATH_ENGINES_CHOICES, max_length=4,
@@ -163,14 +161,14 @@ class Profile(models.Model):
         return self.user.username
 
     @classmethod
-    def get_user_css_class(cls, display_rank, rating, rating_colors=settings.DMOJ_RATING_COLORS):
+    def get_user_css_class(cls, display_rank, rating_colors=settings.DMOJ_RATING_COLORS):
         if rating_colors:
-            return 'rating %s %s' % (rating_class(rating) if rating is not None else 'rate-none', display_rank)
+            return 'rating rate-none %s' % display_rank
         return display_rank
 
     @cached_property
     def css_class(self):
-        return self.get_user_css_class(self.display_rank, self.rating)
+        return self.get_user_css_class(self.display_rank)
 
     class Meta:
         verbose_name = _('user profile')

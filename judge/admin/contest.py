@@ -1,7 +1,7 @@
 from django.conf.urls import url
 from django.contrib import admin
 from django.core.exceptions import PermissionDenied
-from django.db import connection, transaction
+from django.db import transaction
 from django.db.models import Q, TextField
 from django.forms import ModelForm, ModelMultipleChoiceField
 from django.http import Http404, HttpResponseRedirect
@@ -12,8 +12,7 @@ from django.utils.translation import gettext_lazy as _, ungettext
 from reversion.admin import VersionAdmin
 
 from django_ace import AceWidget
-from judge.models import Contest, ContestProblem, ContestSubmission, Profile, Rating
-from judge.ratings import rate_contest
+from judge.models import Contest, ContestProblem, ContestSubmission, Profile
 from judge.utils.views import NoBatchDeleteMixin
 from judge.widgets import AdminHeavySelect2MultipleWidget, AdminHeavySelect2Widget, AdminMartorWidget, \
     AdminSelect2MultipleWidget, AdminSelect2Widget
@@ -79,12 +78,6 @@ class ContestProblemInline(admin.TabularInline):
 class ContestForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(ContestForm, self).__init__(*args, **kwargs)
-        if 'rate_exclude' in self.fields:
-            if self.instance and self.instance.id:
-                self.fields['rate_exclude'].queryset = \
-                    Profile.objects.filter(contest_history__contest=self.instance).distinct()
-            else:
-                self.fields['rate_exclude'].queryset = Profile.objects.none()
         self.fields['banned_users'].widget.can_add_related = False
         self.fields['view_contest_scoreboard'].widget.can_add_related = False
 
@@ -117,20 +110,17 @@ class ContestAdmin(NoBatchDeleteMixin, VersionAdmin):
         (_('Scheduling'), {'fields': ('start_time', 'end_time', 'time_limit')}),
         (_('Details'), {'fields': ('description', 'og_image', 'logo_override_image', 'tags', 'summary')}),
         (_('Format'), {'fields': ('format_name', 'format_config', 'problem_label_script')}),
-        (_('Rating'), {'fields': ('is_rated', 'rate_all', 'rating_floor', 'rating_ceiling', 'rate_exclude')}),
         (_('Registration'), {'fields': ('require_registration', 'registration_start_time',
                                         'registration_end_time', 'registration_page')}),
         (_('Access'), {'fields': ('is_organization_private', 'is_private_viewable', 'organizations',
                                   'is_private', 'private_contestants', 'view_contest_scoreboard')}),
         (_('Justice'), {'fields': ('banned_users',)}),
     )
-    list_display = ('key', 'name', 'is_visible', 'is_rated', 'start_time', 'end_time', 'time_limit', 'user_count')
+    list_display = ('key', 'name', 'is_visible', 'start_time', 'end_time', 'time_limit', 'user_count')
     inlines = [ContestProblemInline]
     actions_on_top = True
     actions_on_bottom = True
     form = ContestForm
-    change_list_template = 'admin/judge/contest/change_list.html'
-    filter_horizontal = ['rate_exclude']
     date_hierarchy = 'start_time'
 
     def get_actions(self, request):
@@ -154,8 +144,6 @@ class ContestAdmin(NoBatchDeleteMixin, VersionAdmin):
         readonly = []
         if not request.user.has_perm('judge.contest_frozen_state') or (obj is not None and obj.freeze_submissions):
             readonly += ['freeze_submissions']
-        if not request.user.has_perm('judge.contest_rating'):
-            readonly += ['is_rated', 'rate_all', 'rate_exclude']
         if not request.user.has_perm('judge.contest_access_code'):
             readonly += ['access_code']
         if not request.user.has_perm('judge.create_private_contest'):
@@ -219,8 +207,6 @@ class ContestAdmin(NoBatchDeleteMixin, VersionAdmin):
 
     def get_urls(self):
         return [
-            url(r'^rate/all/$', self.rate_all_view, name='judge_contest_rate_all'),
-            url(r'^(\d+)/rate/$', self.rate_view, name='judge_contest_rate'),
             url(r'^(\d+)/judge/(\d+)/$', self.rejudge_view, name='judge_contest_rejudge'),
             url(r'^(\d+)/unfreeze/$', self.unfreeze_view, name='judge_contest_unfreeze'),
         ] + super(ContestAdmin, self).get_urls()
@@ -248,27 +234,6 @@ class ContestAdmin(NoBatchDeleteMixin, VersionAdmin):
                                                        .select_related('submission').defer('submission__source'):
                 submission.submission.update_contest()
         return HttpResponseRedirect(reverse('admin:judge_contest_change', args=(id,)))
-
-    def rate_all_view(self, request):
-        if not request.user.has_perm('judge.contest_rating'):
-            raise PermissionDenied()
-        with transaction.atomic():
-            with connection.cursor() as cursor:
-                cursor.execute('TRUNCATE TABLE `%s`' % Rating._meta.db_table)
-            Profile.objects.update(rating=None)
-            for contest in Contest.objects.filter(is_rated=True).order_by('end_time'):
-                rate_contest(contest)
-        return HttpResponseRedirect(reverse('admin:judge_contest_changelist'))
-
-    def rate_view(self, request, id):
-        if not request.user.has_perm('judge.contest_rating'):
-            raise PermissionDenied()
-        contest = get_object_or_404(Contest, id=id)
-        if not contest.is_rated:
-            raise Http404()
-        with transaction.atomic():
-            contest.rate()
-        return HttpResponseRedirect(request.META.get('HTTP_REFERER', reverse('admin:judge_contest_changelist')))
 
     def get_form(self, request, obj=None, **kwargs):
         form = super(ContestAdmin, self).get_form(request, obj, **kwargs)

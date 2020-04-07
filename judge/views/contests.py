@@ -38,7 +38,6 @@ from judge.utils.opengraph import generate_opengraph
 from judge.utils.problems import _get_result_data
 from judge.utils.ranker import ranker
 from judge.utils.stats import get_bar_chart, get_pie_chart
-from judge.utils.strings import safe_int_or_none
 from judge.utils.views import DiggPaginatorMixin, SingleObjectFormView, TitleMixin, generic_message, \
     paginate_query_context
 
@@ -87,13 +86,6 @@ class ContestList(DiggPaginatorMixin, TitleMixin, ContestListMixin, ListView):
             queryset = queryset.filter(is_organization_private=True,
                                        organizations__short_name__in=self.selected_organizations)
 
-        if self.rated_state == 1:
-            queryset = queryset.filter(is_rated=False)
-        elif self.rated_state == 2:
-            queryset = queryset.filter(is_rated=True)
-        elif self.rated_state == 3:
-            queryset = queryset.filter(is_rated=True, rate_all=True)
-
         return queryset.distinct()
 
     def get_queryset(self):
@@ -124,12 +116,6 @@ class ContestList(DiggPaginatorMixin, TitleMixin, ContestListMixin, ListView):
         context['now'] = self._now
         context['first_page_href'] = '.'
 
-        context['rated_state'] = self.rated_state
-        context['rated_states'] = {
-            1: 'Not rated',
-            2: 'Rated',
-            3: 'Rated for all',
-        }
         context['search_query'] = self.search_query
 
         accessible_contests = super().get_queryset()
@@ -150,7 +136,6 @@ class ContestList(DiggPaginatorMixin, TitleMixin, ContestListMixin, ListView):
         self.search_query = None
         self.selected_tags = []
         self.selected_organizations = []
-        self.rated_state = safe_int_or_none(request.GET.get('rated_state'))
 
         if 'search' in request.GET:
             self.search_query = ' '.join(request.GET.getlist('search')).strip()
@@ -651,7 +636,7 @@ class ContestStats(TitleMixin, ContestMixin, DetailView):
 ContestRankingProfile = namedtuple(
     'ContestRankingProfile',
     'id user css_class username points cumtime organization participation '
-    'participation_rating problem_cells result_cell',
+    'problem_cells result_cell',
 )
 
 BestSolutionData = namedtuple('BestSolutionData', 'code points bonus time state is_pretested')
@@ -675,7 +660,6 @@ def make_contest_ranking_profile(contest, participation, contest_problems):
         points=participation.score,
         cumtime=participation.cumtime,
         organization=user.organization,
-        participation_rating=participation.rating.rating if hasattr(participation, 'rating') else None,
         problem_cells=[display_user_problem(contest_problem) for contest_problem in contest_problems],
         result_cell=contest.format.display_participation_result(participation),
         participation=participation,
@@ -684,7 +668,7 @@ def make_contest_ranking_profile(contest, participation, contest_problems):
 
 def base_contest_ranking_list(contest, problems, queryset):
     return [make_contest_ranking_profile(contest, participation, problems) for participation in
-            queryset.select_related('user__user', 'rating').defer('user__organizations__about')]
+            queryset.select_related('user__user').defer('user__organizations__about')]
 
 
 def contest_ranking_list(contest, problems):
@@ -724,7 +708,6 @@ def contest_ranking_ajax(request, contest, participation=None):
         'problems': problems,
         'can_edit': contest.is_editable_by(request.user),
         'contest': contest,
-        'has_rating': contest.ratings.exists(),
     })
 
 
@@ -772,11 +755,6 @@ class ContestRanking(ContestRankingBase):
 
         return get_contest_ranking_list(self.request, self.object)
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['has_rating'] = self.object.ratings.exists()
-        return context
-
 
 class ContestParticipationList(LoginRequiredMixin, ContestRankingBase):
     tab = 'participation'
@@ -801,7 +779,6 @@ class ContestParticipationList(LoginRequiredMixin, ContestRankingBase):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['has_rating'] = False
         context['now'] = timezone.now()
         context['rank_header'] = _('Participation')
         return context
