@@ -5,9 +5,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.functional import lazy
 from django.utils.translation import ugettext as _
-from django.views.generic import DetailView, ListView, View
-from django.views.generic.base import TemplateResponseMixin
-from django.views.generic.detail import SingleObjectMixin
+from django.views.generic import DetailView, ListView
 
 from judge.models import BlogPost, Contest, Language, Problem, ProblemClarification, Profile, Submission, \
     Ticket

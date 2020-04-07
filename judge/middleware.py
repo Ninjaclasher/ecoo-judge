@@ -22,7 +22,7 @@ class DMOJLoginMiddleware(object):
 
     def __call__(self, request):
         if request.user.is_authenticated:
-            profile = request.profile = request.user.profile
+            request.profile = request.user.profile
         else:
             request.profile = None
         return self.get_response(request)
