@@ -27,7 +27,6 @@ class ProfileForm(ModelForm):
             'language': AdminSelect2Widget,
             'ace_theme': AdminSelect2Widget,
             'current_contest': AdminSelect2Widget,
-            'about': AdminMartorWidget(attrs={'data-markdownfy-url': reverse_lazy('profile_preview')}),
         }
 
 
@@ -51,7 +50,6 @@ class ProfileAdmin(NoBatchDeleteMixin, VersionAdmin):
         (_('User Settings'), {'fields': ('organizations', 'timezone', 'language', 'ace_theme', 'math_engine')}),
         (_('Administration'), {'fields': ('is_external_user', 'is_unlisted',
                                           'last_access', 'ip', 'current_contest', 'notes')}),
-        (_('Text Fields'), {'fields': ('about', 'user_script')}),
     )
     list_display = ('user', 'full_name', 'email', 'is_external_user',
                     'date_joined', 'last_access', 'ip', 'show_public')
@@ -114,7 +112,4 @@ class ProfileAdmin(NoBatchDeleteMixin, VersionAdmin):
 
     def get_form(self, request, obj=None, **kwargs):
         form = super(ProfileAdmin, self).get_form(request, obj, **kwargs)
-        if 'user_script' in form.base_fields:
-            # form.base_fields['user_script'] does not exist when the user has only view permission on the model.
-            form.base_fields['user_script'].widget = AceWidget('javascript', request.profile.ace_theme)
         return form

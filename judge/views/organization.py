@@ -104,7 +104,7 @@ class OrganizationUsers(OrganizationDetailView):
         context['title'] = _('%s Members') % self.object.name
         context['users'] = \
             ranker(self.object.members.filter(is_unlisted=False).order_by('-performance_points', '-problem_count')
-                   .select_related('user').defer('about', 'user_script', 'notes'))
+                   .select_related('user').defer('notes'))
         context['partial'] = True
         context['is_admin'] = self.can_edit_organization()
         context['kick_url'] = reverse('organization_user_kick', args=[self.object.id, self.object.slug])

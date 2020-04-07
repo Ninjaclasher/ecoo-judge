@@ -58,13 +58,6 @@
 {% block js_media %}
     {% include "timezone/media-js.html" %}
     {{ form.media.js }}
-    <script type="text/javascript">
-        $(function () {
-            $('#ace_user_script').on('ace_load', function (e, editor) {
-                editor.getSession().setMode("ace/mode/javascript");
-            });
-        });
-    </script>
 {% endblock %}
 
 {% block title_ruler %}{% endblock %}
@@ -86,10 +79,6 @@
             {% endif %}
 
             {% csrf_token %}
-
-            <div style="padding-top:0.5em" class="block-header">{{ _('Self-description') }}:</div>
-            {{ form.about }}
-            <hr>
 
             <table border="0" style="padding-top:0.7em">
                 <tr>
@@ -158,10 +147,6 @@
                 </tr>
             </table>
             <hr>
-            <div class="block-header">{{ _('User-script') }}:</div>
-            {{ form.user_script }}
-            <hr>
-
             <input type="submit" style="float:right" value="{{ _('Update profile') }}">
         </form>
     </div>
