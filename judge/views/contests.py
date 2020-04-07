@@ -264,7 +264,7 @@ class ContestMixin(object):
             }, status=403)
 
 
-class ContestDetail(ContestMixin, TitleMixin):
+class ContestDetail(ContestMixin, TitleMixin, View):
     template_name = 'contest/contest.html'
 
     def get_title(self):

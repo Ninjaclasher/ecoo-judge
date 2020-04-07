@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.functional import lazy
 from django.utils.translation import ugettext as _
-from django.views.generic import ListView
+from django.views.generic import ListView, View
 
 from judge.models import BlogPost, Contest, Language, Problem, ProblemClarification, Profile, Submission, \
     Ticket
@@ -77,7 +77,7 @@ class PostList(ListView):
         return context
 
 
-class PostView(TitleMixin):
+class PostView(TitleMixin, View):
     model = BlogPost
     pk_url_kwarg = 'id'
     context_object_name = 'post'

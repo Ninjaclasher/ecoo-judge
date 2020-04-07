@@ -102,7 +102,7 @@ class SolvedProblemMixin(object):
         return self.request.profile
 
 
-class ProblemSolution(SolvedProblemMixin, ProblemMixin, TitleMixin):
+class ProblemSolution(SolvedProblemMixin, ProblemMixin, TitleMixin, View):
     context_object_name = 'problem'
     template_name = 'problem/editorial.html'
 
@@ -150,7 +150,7 @@ class ProblemRaw(ProblemMixin, TitleMixin, TemplateResponseMixin, SingleObjectMi
             ))
 
 
-class ProblemDetail(ProblemMixin, SolvedProblemMixin):
+class ProblemDetail(ProblemMixin, SolvedProblemMixin, View):
     context_object_name = 'problem'
     template_name = 'problem/problem.html'
 
