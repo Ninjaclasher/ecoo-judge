@@ -66,7 +66,7 @@ class ProfileAdmin(NoBatchDeleteMixin, VersionAdmin):
         return super(ProfileAdmin, self).get_queryset(request).select_related('user')
 
     def get_fieldsets(self, request, obj=None):
-            return self.fieldsets
+        return self.fieldsets
 
     def get_readonly_fields(self, request, obj=None):
         fields = self.readonly_fields

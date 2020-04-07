@@ -26,7 +26,6 @@ from judge.forms import ProfileForm, newsletter_id
 from judge.models import Profile, Rating, Submission, Ticket
 from judge.performance_points import get_pp_breakdown
 from judge.ratings import rating_class, rating_progress
-from judge.utils.cachedict import CacheDict
 from judge.utils.problems import contest_completed_ids, user_completed_ids
 from judge.utils.ranker import ranker
 from judge.utils.subscription import Subscription

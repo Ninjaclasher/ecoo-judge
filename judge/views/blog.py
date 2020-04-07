@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.db.models import Count, Q
+from django.db.models import Q
 from django.http import Http404
 from django.urls import reverse
 from django.utils import timezone
@@ -9,7 +9,6 @@ from django.views.generic import ListView
 
 from judge.models import BlogPost, Contest, Language, Problem, ProblemClarification, Profile, Submission, \
     Ticket
-from judge.utils.cachedict import CacheDict
 from judge.utils.diggpaginator import DiggPaginator
 from judge.utils.views import TitleMixin
 

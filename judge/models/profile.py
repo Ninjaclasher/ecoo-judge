@@ -2,7 +2,6 @@ from operator import mul
 
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models import Max
 from django.urls import reverse
