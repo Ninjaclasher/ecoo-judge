@@ -25,7 +25,6 @@ from django.views.generic import ListView, View
 from django.views.generic.base import TemplateResponseMixin
 from django.views.generic.detail import SingleObjectMixin
 
-from judge.comments import CommentedDetailView
 from judge.forms import ProblemCloneForm, ProblemSubmitForm
 from judge.models import ContestProblem, ContestSubmission, Judge, Language, Problem, ProblemGroup, \
     ProblemTranslation, ProblemType, RuntimeVersion, Solution, Submission, SubmissionSource, \
@@ -103,7 +102,7 @@ class SolvedProblemMixin(object):
         return self.request.profile
 
 
-class ProblemSolution(SolvedProblemMixin, ProblemMixin, TitleMixin, CommentedDetailView):
+class ProblemSolution(SolvedProblemMixin, ProblemMixin, TitleMixin):
     context_object_name = 'problem'
     template_name = 'problem/editorial.html'
 
@@ -128,9 +127,6 @@ class ProblemSolution(SolvedProblemMixin, ProblemMixin, TitleMixin, CommentedDet
         context['has_solved_problem'] = self.object.id in self.get_completed_problems()
         return context
 
-    def get_comment_page(self):
-        return 's:' + self.object.code
-
 
 class ProblemRaw(ProblemMixin, TitleMixin, TemplateResponseMixin, SingleObjectMixin, View):
     context_object_name = 'problem'
@@ -154,16 +150,9 @@ class ProblemRaw(ProblemMixin, TitleMixin, TemplateResponseMixin, SingleObjectMi
             ))
 
 
-class ProblemDetail(ProblemMixin, SolvedProblemMixin, CommentedDetailView):
+class ProblemDetail(ProblemMixin, SolvedProblemMixin):
     context_object_name = 'problem'
     template_name = 'problem/problem.html'
-
-    def get_comment_page(self):
-        return 'p:%s' % self.object.code
-
-    def is_comment_locked(self):
-        return ((super().is_comment_locked() or not self.object.is_public) and
-                not self.request.user.has_perm('judge.override_comment_lock'))
 
     def get_context_data(self, **kwargs):
         context = super(ProblemDetail, self).get_context_data(**kwargs)

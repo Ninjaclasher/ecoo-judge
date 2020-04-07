@@ -17,7 +17,7 @@ from django.views.generic.detail import SingleObjectMixin, SingleObjectTemplateR
 from reversion import revisions
 
 from judge.forms import EditOrganizationForm
-from judge.models import BlogPost, Comment, Organization, OrganizationRequest, Problem, Profile
+from judge.models import BlogPost, Organization, OrganizationRequest, Problem, Profile
 from judge.utils.ranker import ranker
 from judge.utils.views import TitleMixin, generic_message
 
@@ -93,11 +93,6 @@ class OrganizationHome(OrganizationDetailView):
                                                    is_organization_private=True, organizations=self.object) \
                                            .order_by('-sticky', '-publish_on') \
                                            .prefetch_related('authors__user', 'organizations')
-        context['post_comment_counts'] = {
-            int(page[2:]): count for page, count in
-            Comment.objects.filter(page__in=['b:%d' % post.id for post in context['posts']], hidden=False)
-                           .values_list('page').annotate(count=Count('page')).order_by()
-        }
         return context
 
 

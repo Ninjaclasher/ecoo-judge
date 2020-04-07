@@ -6,7 +6,7 @@ from django.utils import timezone
 from django.utils.feedgenerator import Atom1Feed
 
 from judge.jinja2.markdown import markdown
-from judge.models import BlogPost, Comment, Problem
+from judge.models import BlogPost, Problem
 
 
 class ProblemFeed(Feed):
@@ -37,36 +37,6 @@ class ProblemFeed(Feed):
 class AtomProblemFeed(ProblemFeed):
     feed_type = Atom1Feed
     subtitle = ProblemFeed.description
-
-
-class CommentFeed(Feed):
-    title = 'Latest %s Comments' % settings.SITE_NAME
-    link = '/'
-    description = 'The latest comments on the %s website' % settings.SITE_LONG_NAME
-
-    def items(self):
-        return Comment.most_recent(AnonymousUser(), 25)
-
-    def item_title(self, comment):
-        return '%s -> %s' % (comment.author.user.username, comment.page_title)
-
-    def item_description(self, comment):
-        key = 'comment_feed:%d' % comment.id
-        desc = cache.get(key)
-        if desc is None:
-            desc = str(markdown(comment.body, 'comment'))
-            cache.set(key, desc, 86400)
-        return desc
-
-    def item_pubdate(self, comment):
-        return comment.time
-
-    item_updateddate = item_pubdate
-
-
-class AtomCommentFeed(CommentFeed):
-    feed_type = Atom1Feed
-    subtitle = CommentFeed.description
 
 
 class BlogFeed(Feed):

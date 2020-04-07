@@ -17,11 +17,6 @@
         });
     </script>
     {% include "contest/media-js.html" %}
-    {% include "comments/media-js.html" %}
-{% endblock %}
-
-{% block content_media %}
-    {% include "comments/media-css.html" %}
 {% endblock %}
 
 {% block body %}
@@ -126,14 +121,6 @@
         {{ post_to_facebook(request, contest, '<i class="fa fa-facebook-official"></i>') }}
         {{ post_to_twitter(request, SITE_NAME + ':', contest, '<i class="fa fa-twitter"></i>') }}
     </span>
-
-    {% include "comments/list.html" %}
 {% endblock %}
 
 {% block description_end %}{% endblock %}
-
-{% block bodyend %}
-    {{ super() }}
-    {% include "comments/math.html" %}
-{% endblock %}
-k

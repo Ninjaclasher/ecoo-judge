@@ -5,8 +5,6 @@
 {% block media %}
     <link rel="alternate" type="application/atom+xml" href="{{ url('blog_atom') }}" title="Atom Blog Feed">
     <link rel="alternate" type="application/rss+xml" href="{{ url('blog_rss') }}" title="RSS Blog Feed">
-    <link rel="alternate" type="application/atom+xml" href="{{ url('comment_atom') }}" title="Atom Comment Feed">
-    <link rel="alternate" type="application/rss+xml" href="{{ url('comment_rss') }}" title="RSS Comment Feed">
     <link rel="alternate" type="application/atom+xml" href="{{ url('problem_atom') }}" title="Atom Problem Feed">
     <link rel="alternate" type="application/rss+xml" href="{{ url('problem_rss') }}" title="RSS Problem Feed">
     {% include "blog/media-css.html" %}
@@ -151,25 +149,6 @@
                 </div>
             {% endif %}
 
-            <div class="blog-sidebox sidebox">
-                <h3>{{ _('Comment stream') }} <i class="fa fa-comments"></i></h3>
-                <div class="sidebox-content">
-                    <ul>
-                        {% for comment in comments %}
-                            <li>
-                                <span style="padding-left:0.25em" class="poster">
-                                    {{ link_user(comment.author) }}
-                                </span> &rarr;
-                                <a href="{{ comment.link }}#comment-{{ comment.id }}">{{ page_titles[comment.page] }}</a>
-                            </li>{% endfor %}
-                    </ul>
-                    <span class="rssatom">
-                        <a href="{{ url('comment_rss') }}"><span><i class="fa fa-rss"></i></span> RSS</a>
-                        /
-                        <a href="{{ url('comment_atom') }}">Atom</a>
-                    </span>
-                </div>
-            </div>
             <div class="blog-sidebox sidebox">
                 <h3>{{ _('New problems') }} <i class="fa fa-puzzle-piece"></i>
                 </h3>

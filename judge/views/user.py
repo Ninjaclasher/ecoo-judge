@@ -23,7 +23,7 @@ from django.views.generic import DetailView, ListView, TemplateView
 from reversion import revisions
 
 from judge.forms import ProfileForm, newsletter_id
-from judge.models import Comment, Profile, Rating, Submission, Ticket
+from judge.models import Profile, Rating, Submission, Ticket
 from judge.performance_points import get_pp_breakdown
 from judge.ratings import rating_class, rating_progress
 from judge.utils.cachedict import CacheDict
@@ -138,9 +138,7 @@ class UserDashboard(UserPage):
                                                   .annotate(points=Max('points'), latest=Max('date'))
                                                   .order_by('-latest')
                                                   [:settings.DMOJ_BLOG_RECENTLY_ATTEMPTED_PROBLEMS_COUNT])
-        context['own_comments'] = Comment.most_recent(user, 10, queryset=Comment.objects.filter(author=profile))
         context['own_tickets'] = Ticket.tickets_list(user).filter(user=profile)[:10]
-        context['page_titles'] = CacheDict(lambda page: Comment.get_page_title(page))
 
         return context
 

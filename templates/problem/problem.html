@@ -1,6 +1,5 @@
 {% extends "common-content.html" %}
 {% block content_media %}
-    {% include "comments/media-css.html" %}
     <style>
         .title-state {
             font-size: 2em;
@@ -45,7 +44,6 @@
 {% endblock %}
 
 {% block content_js_media %}
-    {% include "comments/media-js.html" %}
 {% endblock %}
 
 {% block title_row %}
@@ -306,29 +304,6 @@
     {% endif %}
 {% endblock %}
 
-{% block comments %}
-    {% if contest_problem and contest_problem.contest.use_clarifications %}
-        <div class="clarifications-area">
-            <h2><i class="fa fa-question-circle"></i> {{ _('Clarifications') }}</h2>
-            {% if has_clarifications %}
-                {% for clarification in clarifications %}
-                    <div class="problem-clarification">
-                        <div class="time">{{ relative_time(clarification.date) }}</div>
-                        <span class="body">
-                            {{ clarification.description|markdown('problem', MATH_ENGINE)|reference }}
-                        </span>
-                    </div>
-                {% endfor %}
-            {% else %}
-                <p class="no-comments-message">{{ _('No clarifications have been made at this time.') }}</p>
-            {% endif %}
-        </div>
-    {% else %}
-        {% include "comments/list.html" %}
-    {% endif %}
-{% endblock %}
-
 {% block bodyend %}
     {{ super() }}
-    {% include "comments/math.html" %}
 {% endblock %}

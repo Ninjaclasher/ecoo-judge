@@ -203,13 +203,6 @@ else:
                     ],
                 },
                 ('judge.BlogPost', 'fa-rss-square'),
-                {
-                    'model': 'judge.Comment',
-                    'icon': 'fa-comment-o',
-                    'children': [
-                        'judge.CommentLock',
-                    ],
-                },
                 ('flatpages.FlatPage', 'fa-file-text-o'),
                 ('judge.Solution', 'fa-pencil'),
             ],

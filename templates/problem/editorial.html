@@ -1,13 +1,5 @@
 {% extends "common-content.html" %}
 
-{% block content_js_media %}
-    {% include "comments/media-js.html" %}
-{% endblock %}
-
-{% block content_media %}
-    {% include "comments/media-css.html" %}
-{% endblock %}
-
 {% block header %}
     <div style="float:right">
         {% if problem.is_editable_by(request.user) %}
@@ -35,13 +27,10 @@
         {% endwith %}
         {{ solution.content|markdown('solution', MATH_ENGINE)|reference|str|safe }}
     </div>
-    <hr>
-    {% include "comments/list.html" %}
 {% endblock %}
 
 {% block bodyend %}
     {% if REQUIRE_JAX %}
         {% include "mathjax-load.html" %}
     {% endif %}
-    {% include "comments/math.html" %}
 {% endblock %}

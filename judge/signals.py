@@ -9,7 +9,7 @@ from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 
 from .caching import finished_submission
-from .models import BlogPost, Comment, Contest, ContestSubmission, EFFECTIVE_MATH_ENGINES, Judge, Language, License, \
+from .models import BlogPost, Contest, ContestSubmission, EFFECTIVE_MATH_ENGINES, Judge, Language, License, \
     MiscConfig, Organization, Problem, Profile, Submission
 
 
@@ -80,11 +80,6 @@ def language_update(sender, instance, **kwargs):
 @receiver(post_save, sender=Judge)
 def judge_update(sender, instance, **kwargs):
     cache.delete(make_template_fragment_key('judge_html', (instance.id,)))
-
-
-@receiver(post_save, sender=Comment)
-def comment_update(sender, instance, **kwargs):
-    cache.delete('comment_feed:%d' % instance.id)
 
 
 @receiver(post_save, sender=BlogPost)

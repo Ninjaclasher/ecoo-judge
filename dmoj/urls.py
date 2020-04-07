@@ -11,17 +11,17 @@ from django.utils.translation import ugettext_lazy as _
 from django.views.generic import RedirectView
 from martor.views import markdown_search_user
 
-from judge.feed import AtomBlogFeed, AtomCommentFeed, AtomProblemFeed, BlogFeed, CommentFeed, ProblemFeed
+from judge.feed import AtomBlogFeed, AtomProblemFeed, BlogFeed, ProblemFeed
 from judge.forms import CustomAuthenticationForm
 from judge.sitemap import BlogPostSitemap, ContestSitemap, HomePageSitemap, OrganizationSitemap, ProblemSitemap, \
     SolutionSitemap, UrlSitemap, UserSitemap
-from judge.views import TitledTemplateView, blog, comment, contests, language, license, mailgun, organization, \
+from judge.views import TitledTemplateView, blog, contests, language, license, mailgun, organization, \
     preview, problem, problem_manage, ranked_submission, register, stats, status, submission, tasks, ticket, \
     user, widgets
 from judge.views.problem_data import ProblemDataView, ProblemSubmissionDiff, \
     problem_data_file, problem_init_view
 from judge.views.register import ActivationView, RegistrationView
-from judge.views.select2 import AssigneeSelect2View, CommentSelect2View, ContestSelect2View, \
+from judge.views.select2 import AssigneeSelect2View, ContestSelect2View, \
     ContestUserSearchSelect2View, OrganizationSelect2View, ProblemSelect2View, TicketUserSelect2View, \
     UserSearchSelect2View, UserSelect2View
 from judge.views.widgets import martor_image_uploader
@@ -179,17 +179,6 @@ urlpatterns = [
         url(r'^/$', lambda _, user: HttpResponsePermanentRedirect(reverse('user_page', args=[user]))),
     ])),
 
-    url(r'^comments/upvote/$', comment.upvote_comment, name='comment_upvote'),
-    url(r'^comments/downvote/$', comment.downvote_comment, name='comment_downvote'),
-    url(r'^comments/hide/$', comment.comment_hide, name='comment_hide'),
-    url(r'^comments/(?P<id>\d+)/', include([
-        url(r'^edit$', comment.CommentEdit.as_view(), name='comment_edit'),
-        url(r'^history/ajax$', comment.CommentRevisionAjax.as_view(), name='comment_revision_ajax'),
-        url(r'^edit/ajax$', comment.CommentEditAjax.as_view(), name='comment_edit_ajax'),
-        url(r'^votes/ajax$', comment.CommentVotesAjax.as_view(), name='comment_votes_ajax'),
-        url(r'^render$', comment.CommentContent.as_view(), name='comment_content'),
-    ])),
-
     url(r'^contests/$', contests.ContestList.as_view(), name='contest_list'),
     url(r'^contests/(?P<year>\d+)/(?P<month>\d+)/$', contests.ContestCalendar.as_view(), name='contest_calendar'),
     url(r'^contests/tag/(?P<name>[a-z-]+)', include([
@@ -280,8 +269,8 @@ urlpatterns = [
             url(r'^default$', preview.DefaultMarkdownPreviewView.as_view(), name='default_preview'),
             url(r'^problem$', preview.ProblemMarkdownPreviewView.as_view(), name='problem_preview'),
             url(r'^blog$', preview.BlogMarkdownPreviewView.as_view(), name='blog_preview'),
-            url(r'^contest$', preview.ContestMarkdownPreviewView.as_view(), name='contest_preview'),
             url(r'^comment$', preview.CommentMarkdownPreviewView.as_view(), name='comment_preview'),
+            url(r'^contest$', preview.ContestMarkdownPreviewView.as_view(), name='contest_preview'),
             url(r'^flatpage$', preview.FlatPageMarkdownPreviewView.as_view(), name='flatpage_preview'),
             url(r'^profile$', preview.ProfileMarkdownPreviewView.as_view(), name='profile_preview'),
             url(r'^organization$', preview.OrganizationMarkdownPreviewView.as_view(), name='organization_preview'),
@@ -299,8 +288,6 @@ urlpatterns = [
     url(r'^feed/', include([
         url(r'^problems/rss/$', ProblemFeed(), name='problem_rss'),
         url(r'^problems/atom/$', AtomProblemFeed(), name='problem_atom'),
-        url(r'^comment/rss/$', CommentFeed(), name='comment_rss'),
-        url(r'^comment/atom/$', AtomCommentFeed(), name='comment_atom'),
         url(r'^blog/rss/$', BlogFeed(), name='blog_rss'),
         url(r'^blog/atom/$', AtomBlogFeed(), name='blog_atom'),
     ])),
@@ -346,7 +333,6 @@ urlpatterns = [
         url(r'^organization/$', OrganizationSelect2View.as_view(), name='organization_select2'),
         url(r'^problem/$', ProblemSelect2View.as_view(), name='problem_select2'),
         url(r'^contest/$', ContestSelect2View.as_view(), name='contest_select2'),
-        url(r'^comment/$', CommentSelect2View.as_view(), name='comment_select2'),
     ])),
 
     url(r'^tasks/', include([

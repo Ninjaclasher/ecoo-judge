@@ -67,21 +67,6 @@
         </div>
         <div id="dashboard-right">
             <div class="dashboard-box sidebox">
-                <h3>{{  _('My recent comments') }} <i class="fa fa-comment"></i></h3>
-                <div class="sidebox-content dashboard-content">
-                    <ul>
-                        {% for comment in own_comments %}
-                            <li>
-                                <a href="{{ comment.link }}#comment-{{ comment.id }}">{{ page_titles[comment.page] }}</a>
-                                {{ format_datetime(comment.time) }}
-                            </li>
-                        {% else %}
-                            <i>{{ _('You have not commented on any pages.') }}</i>
-                        {% endfor %}
-                    </ul>
-                </div>
-            </div>
-            <div class="dashboard-box sidebox">
                 <h3>{{  _('My open tickets') }} <i class="fa fa-exclamation-circle"></i></h3>
                 <div class="sidebox-content dashboard-content">
                     <ul>
