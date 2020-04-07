@@ -1,18 +1,13 @@
 {% extends "user/base-users.html" %}
 {% block users_media %}
     <style>
-        #users-table td:nth-child(2), #users-table th:nth-child(2) {
-            border-right: none;
-            text-align: left;
-        }
-
         .kick-form .button {
             margin: -8px 0;
         }
     </style>
 
     {% if is_admin %}
-        <style>#users-table td:nth-child(3), #users-table th:nth-child(3) {
+        <style>#users-table td:nth-child(2), #users-table th:nth-child(2) {
             border-right: none;
         }
         </style>
@@ -22,10 +17,6 @@
 {% block users_js_media %}
     <script type="text/javascript">
         $(function () {
-        //    $('form.kick-form').find('a.button').click(function () {
-        //        $(this).parent().submit();
-        //        return false;
-        //})
             $('a#kick-user-link').click(function (event) {
                 event.preventDefault();
                 if (confirm('Are you sure you want to kick a user?'))
