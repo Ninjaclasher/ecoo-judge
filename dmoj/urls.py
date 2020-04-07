@@ -2,7 +2,6 @@ from django.conf import settings
 from django.conf.urls import include, url
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
-from django.contrib.sitemaps.views import sitemap
 from django.http import Http404, HttpResponsePermanentRedirect
 from django.templatetags.static import static
 from django.urls import path, reverse
@@ -12,8 +11,6 @@ from django.views.generic import RedirectView
 from martor.views import markdown_search_user
 
 from judge.forms import CustomAuthenticationForm
-from judge.sitemap import BlogPostSitemap, ContestSitemap, HomePageSitemap, OrganizationSitemap, ProblemSitemap, \
-    SolutionSitemap, UrlSitemap, UserSitemap
 from judge.views import TitledTemplateView, blog, contests, language, license, mailgun, organization, \
     preview, problem, problem_manage, ranked_submission, register, status, submission, tasks, ticket, \
     user, widgets
@@ -296,19 +293,6 @@ urlpatterns = [
         url(r'^/close$', ticket.TicketStatusChangeView.as_view(open=False), name='ticket_close'),
         url(r'^/notes$', ticket.TicketNotesEditView.as_view(), name='ticket_notes'),
     ])),
-
-    url(r'^sitemap\.xml$', sitemap, {'sitemaps': {
-        'problem': ProblemSitemap,
-        'user': UserSitemap,
-        'home': HomePageSitemap,
-        'contest': ContestSitemap,
-        'organization': OrganizationSitemap,
-        'blog': BlogPostSitemap,
-        'solutions': SolutionSitemap,
-        'pages': UrlSitemap([
-            {'location': '/about/', 'priority': 0.9},
-        ]),
-    }}),
 
     url(r'^judge-select2/', include([
         url(r'^profile/$', UserSelect2View.as_view(), name='profile_select2'),
