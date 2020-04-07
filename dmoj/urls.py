@@ -284,7 +284,7 @@ urlpatterns = [
         ])),
     ])),
 
-    rrl(r'^tickets/', include([
+    url(r'^tickets/', include([
         url(r'^$', ticket.TicketList.as_view(), name='ticket_list'),
         url(r'^ajax$', ticket.TicketListDataAjax.as_view(), name='ticket_ajax'),
     ])),
