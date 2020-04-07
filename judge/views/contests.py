@@ -26,6 +26,7 @@ from django.utils.safestring import mark_safe
 from django.utils.timezone import make_aware
 from django.utils.translation import gettext as _, gettext_lazy
 from django.views.generic import ListView, TemplateView
+from django.views.generic.base import TemplateResponseMixin
 from django.views.generic.detail import BaseDetailView, DetailView, SingleObjectMixin, View
 
 from judge import event_poster as event
@@ -264,7 +265,7 @@ class ContestMixin(object):
             }, status=403)
 
 
-class ContestDetail(ContestMixin, TitleMixin, View):
+class ContestDetail(ContestMixin, TitleMixin, DetailView):
     template_name = 'contest/contest.html'
 
     def get_title(self):

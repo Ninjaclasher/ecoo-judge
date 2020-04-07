@@ -21,7 +21,7 @@ from django.utils.functional import cached_property
 from django.utils.html import escape, format_html
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext as _, gettext_lazy
-from django.views.generic import ListView, View
+from django.views.generic import DetailView, ListView, View
 from django.views.generic.base import TemplateResponseMixin
 from django.views.generic.detail import SingleObjectMixin
 
@@ -102,7 +102,7 @@ class SolvedProblemMixin(object):
         return self.request.profile
 
 
-class ProblemSolution(SolvedProblemMixin, ProblemMixin, TitleMixin, View):
+class ProblemSolution(SolvedProblemMixin, ProblemMixin, TitleMixin, DetailView):
     context_object_name = 'problem'
     template_name = 'problem/editorial.html'
 
@@ -150,7 +150,7 @@ class ProblemRaw(ProblemMixin, TitleMixin, TemplateResponseMixin, SingleObjectMi
             ))
 
 
-class ProblemDetail(ProblemMixin, SolvedProblemMixin, View):
+class ProblemDetail(ProblemMixin, SolvedProblemMixin, DetailView):
     context_object_name = 'problem'
     template_name = 'problem/problem.html'
 
