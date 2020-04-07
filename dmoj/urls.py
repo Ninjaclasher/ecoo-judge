@@ -11,7 +11,6 @@ from django.utils.translation import ugettext_lazy as _
 from django.views.generic import RedirectView
 from martor.views import markdown_search_user
 
-from judge.feed import AtomBlogFeed, AtomProblemFeed, BlogFeed, ProblemFeed
 from judge.forms import CustomAuthenticationForm
 from judge.sitemap import BlogPostSitemap, ContestSitemap, HomePageSitemap, OrganizationSitemap, ProblemSitemap, \
     SolutionSitemap, UrlSitemap, UserSitemap
@@ -285,14 +284,7 @@ urlpatterns = [
         ])),
     ])),
 
-    url(r'^feed/', include([
-        url(r'^problems/rss/$', ProblemFeed(), name='problem_rss'),
-        url(r'^problems/atom/$', AtomProblemFeed(), name='problem_atom'),
-        url(r'^blog/rss/$', BlogFeed(), name='blog_rss'),
-        url(r'^blog/atom/$', AtomBlogFeed(), name='blog_atom'),
-    ])),
-
-    url(r'^tickets/', include([
+    rrl(r'^tickets/', include([
         url(r'^$', ticket.TicketList.as_view(), name='ticket_list'),
         url(r'^ajax$', ticket.TicketListDataAjax.as_view(), name='ticket_ajax'),
     ])),

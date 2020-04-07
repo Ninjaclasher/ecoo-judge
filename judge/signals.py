@@ -32,7 +32,6 @@ def problem_update(sender, instance, **kwargs):
 
     cache.delete_many([
         make_template_fragment_key('submission_problem', (instance.id,)),
-        make_template_fragment_key('problem_feed', (instance.id,)),
         'problem_tls:%s' % instance.id, 'problem_mls:%s' % instance.id,
     ])
     cache.delete_many([make_template_fragment_key('problem_html', (instance.id, engine, lang))
@@ -85,7 +84,6 @@ def post_update(sender, instance, **kwargs):
     cache.delete_many([
         make_template_fragment_key('post_summary', (instance.id,)),
         'blog_slug:%d' % instance.id,
-        'blog_feed:%d' % instance.id,
     ])
     cache.delete_many([make_template_fragment_key('post_content', (instance.id, engine))
                        for engine in EFFECTIVE_MATH_ENGINES])
