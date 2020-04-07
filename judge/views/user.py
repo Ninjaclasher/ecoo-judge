@@ -19,7 +19,6 @@ from django.utils.formats import date_format
 from django.utils.functional import cached_property
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext as _, gettext_lazy
-from django.views.decorators.http import require_POST
 from django.views.generic import DetailView, ListView, TemplateView
 from reversion import revisions
 

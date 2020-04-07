@@ -1,5 +1,4 @@
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
 from django.urls import Resolver404, resolve, reverse
 from django.utils.http import urlquote
