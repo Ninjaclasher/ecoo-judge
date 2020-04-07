@@ -156,7 +156,6 @@ else:
                     'icon': 'fa-question-circle',
                     'children': [
                         'judge.ProblemGroup',
-                        'judge.ProblemType',
                     ],
                 },
                 {

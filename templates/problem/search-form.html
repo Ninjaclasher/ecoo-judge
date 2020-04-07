@@ -20,11 +20,6 @@
                     <label for="hide_solved">{{ _('Hide solved problems') }}</label>
                 </div>
             {% endif %}
-            <div>
-                <input id="show_types" type="checkbox" name="show_types" value="1"
-                        {% if show_types %} checked{% endif %}>
-                <label for="show_types">{{ _('Show problem types') }}</label>
-            </div>
             {% if perms.judge.see_private_problem %}
                 <div class="filter-form-group">
                     <label for="problem_visibility"><i>{{ _('Problem Visibility') }}</i></label>
@@ -56,18 +51,6 @@
                     {% endfor %}
                 </select>
             </div>
-            {% if show_types %}
-                <div class="filter-form-group">
-                    <label for="type"><i>{{ _('Problem types') }}</i></label>
-                    <select id="types" name="type" multiple>
-                        {% for type in problem_types %}
-                            <option value="{{ type.id }}"{% if type.id in selected_types %} selected{% endif %}>
-                                {{ type.full_name }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                </div>
-            {% endif %}
             {% if point_values %}
                 <div class="form-label">{{ _('Point range') }}</div>
                 <div id="point-slider"></div>

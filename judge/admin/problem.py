@@ -13,7 +13,7 @@ from reversion.admin import VersionAdmin
 
 from judge.models import LanguageLimit, Problem, ProblemClarification, ProblemTranslation, Profile, Solution
 from judge.utils.views import NoBatchDeleteMixin
-from judge.widgets import AdminHeavySelect2MultipleWidget, AdminMartorWidget, AdminSelect2MultipleWidget, \
+from judge.widgets import AdminHeavySelect2MultipleWidget, AdminMartorWidget, \
     AdminSelect2Widget, CheckboxSelectMultipleWithSelectAll
 
 
@@ -39,7 +39,6 @@ class ProblemForm(ModelForm):
                                                             attrs={'style': 'width: 100%'}),
             'organizations': AdminHeavySelect2MultipleWidget(data_view='organization_select2',
                                                              attrs={'style': 'width: 100%'}),
-            'types': AdminSelect2MultipleWidget,
             'group': AdminSelect2Widget,
             'description': AdminMartorWidget(attrs={'data-markdownfy-url': reverse_lazy('problem_preview')}),
         }
@@ -121,7 +120,7 @@ class ProblemAdmin(NoBatchDeleteMixin, VersionAdmin):
             ),
         }),
         (_('Social Media'), {'classes': ('collapse',), 'fields': ('og_image', 'summary')}),
-        (_('Taxonomy'), {'fields': ('types', 'group')}),
+        (_('Taxonomy'), {'fields': ('group',)}),
         (_('Points'), {'fields': (('points', 'partial'), 'short_circuit')}),
         (_('Limits'), {'fields': ('time_limit', 'memory_limit')}),
         (_('Language'), {'fields': ('allowed_languages',)}),

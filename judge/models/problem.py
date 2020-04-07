@@ -1,5 +1,3 @@
-from operator import attrgetter
-
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
 from django.core.cache import cache
@@ -15,24 +13,10 @@ from django.utils.translation import gettext_lazy as _
 from judge.fulltext import SearchQuerySet
 from judge.models.profile import Organization, Profile
 from judge.models.runtime import Language
-from judge.user_translations import gettext as user_gettext
 from judge.utils.raw_sql import RawSQLColumn, unique_together_left_join
 
-__all__ = ['ProblemGroup', 'ProblemType', 'Problem', 'ProblemTranslation', 'ProblemClarification',
+__all__ = ['ProblemGroup', 'Problem', 'ProblemTranslation', 'ProblemClarification',
            'License', 'Solution', 'TranslatedProblemQuerySet', 'TranslatedProblemForeignKeyQuerySet']
-
-
-class ProblemType(models.Model):
-    name = models.CharField(max_length=20, verbose_name=_('problem category ID'), unique=True)
-    full_name = models.CharField(max_length=100, verbose_name=_('problem category name'))
-
-    def __str__(self):
-        return self.full_name
-
-    class Meta:
-        ordering = ['full_name']
-        verbose_name = _('problem type')
-        verbose_name_plural = _('problem types')
 
 
 class ProblemGroup(models.Model):
@@ -110,9 +94,6 @@ class Problem(models.Model):
     testers = models.ManyToManyField(Profile, verbose_name=_('testers'), blank=True, related_name='tested_problems',
                                      help_text=_(
                                          'These users will be able to view the private problem, but not edit it.'))
-    types = models.ManyToManyField(ProblemType, verbose_name=_('problem types'),
-                                   help_text=_('The type of problem, '
-                                               "as shown on the problem's page."))
     group = models.ForeignKey(ProblemGroup, verbose_name=_('problem group'), on_delete=CASCADE,
                               help_text=_('The group of problem, shown under Category in the problem list.'))
     time_limit = models.FloatField(verbose_name=_('time limit'),
@@ -164,10 +145,6 @@ class Problem(models.Model):
         self._translated_name_cache = {}
         self._i18n_name = None
         self.__original_code = self.code
-
-    @cached_property
-    def types_list(self):
-        return list(map(user_gettext, map(attrgetter('full_name'), self.types.all())))
 
     def languages_list(self):
         return self.allowed_languages.values_list('common_name', flat=True).distinct().order_by('common_name')

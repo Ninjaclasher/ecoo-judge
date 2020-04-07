@@ -27,7 +27,7 @@ from django.views.generic.detail import SingleObjectMixin
 
 from judge.forms import ProblemCloneForm, ProblemSubmitForm
 from judge.models import ContestProblem, ContestSubmission, Judge, Language, Problem, ProblemGroup, \
-    ProblemTranslation, ProblemType, RuntimeVersion, Solution, Submission, SubmissionSource, \
+    ProblemTranslation, RuntimeVersion, Solution, Submission, SubmissionSource, \
     TranslatedProblemForeignKeyQuerySet
 from judge.pdf_problems import DefaultPdfMaker, HAS_PDF
 from judge.utils.diggpaginator import DiggPaginator
@@ -286,7 +286,7 @@ class ProblemList(QueryStringSortMixin, TitleMixin, SolvedProblemMixin, ListView
     template_name = 'problem/list.html'
     paginate_by = 50
     sql_sort = frozenset(('points', 'ac_rate', 'user_count', 'code'))
-    manual_sort = frozenset(('name', 'group', 'solved', 'type'))
+    manual_sort = frozenset(('name', 'group', 'solved'))
     all_sorts = sql_sort | manual_sort
     default_desc = frozenset(('points', 'ac_rate', 'user_count'))
     default_sort = 'code'
@@ -323,11 +323,6 @@ class ProblemList(QueryStringSortMixin, TitleMixin, SolvedProblemMixin, ListView
 
                     queryset = list(queryset)
                     queryset.sort(key=_solved_sort_order, reverse=self.order.startswith('-'))
-            elif sort_key == 'type':
-                if self.show_types:
-                    queryset = list(queryset)
-                    queryset.sort(key=lambda problem: problem.types_list[0] if problem.types_list else '',
-                                  reverse=self.order.startswith('-'))
             paginator.object_list = list(queryset)
         return paginator
 
@@ -363,8 +358,6 @@ class ProblemList(QueryStringSortMixin, TitleMixin, SolvedProblemMixin, ListView
         if self.profile is not None and self.hide_solved:
             queryset = queryset.exclude(id__in=Submission.objects.filter(user=self.profile, points=F('problem__points'))
                                         .values_list('problem__id', flat=True))
-        if self.show_types:
-            queryset = queryset.prefetch_related('types')
         if self.category is not None:
             queryset = queryset.filter(group__id=self.category)
 
@@ -385,8 +378,6 @@ class ProblemList(QueryStringSortMixin, TitleMixin, SolvedProblemMixin, ListView
             if filter is not None:
                 queryset = queryset.filter(filter)
 
-        if self.selected_types:
-            queryset = queryset.filter(types__in=self.selected_types)
         if 'search' in self.request.GET:
             self.search_query = query = ' '.join(self.request.GET.getlist('search')).strip()
             if query:
@@ -412,7 +403,6 @@ class ProblemList(QueryStringSortMixin, TitleMixin, SolvedProblemMixin, ListView
     def get_context_data(self, **kwargs):
         context = super(ProblemList, self).get_context_data(**kwargs)
         context['hide_solved'] = 0 if self.in_contest else int(self.hide_solved)
-        context['show_types'] = 0 if self.in_contest else int(self.show_types)
         context['full_text'] = 0 if self.in_contest else int(self.full_text)
         context['problem_visibility'] = self.problem_visibility
         context['visibilities'] = {
@@ -424,9 +414,6 @@ class ProblemList(QueryStringSortMixin, TitleMixin, SolvedProblemMixin, ListView
 
         context['category'] = self.category
         context['categories'] = ProblemGroup.objects.all()
-        if self.show_types:
-            context['selected_types'] = self.selected_types
-            context['problem_types'] = ProblemType.objects.all()
         context['has_fts'] = settings.ENABLE_FTS
         context['search_query'] = self.search_query
         context['completed_problem_ids'] = self.get_completed_problems()
@@ -469,26 +456,17 @@ class ProblemList(QueryStringSortMixin, TitleMixin, SolvedProblemMixin, ListView
 
     def setup_problem_list(self, request):
         self.hide_solved = self.GET_with_session(request, 'hide_solved')
-        self.show_types = self.GET_with_session(request, 'show_types')
         self.full_text = self.GET_with_session(request, 'full_text')
 
         self.search_query = None
         self.category = None
         self.problem_visibility = None
-        self.selected_types = []
 
         # This actually copies into the instance dictionary...
         self.all_sorts = set(self.all_sorts)
-        if not self.show_types:
-            self.all_sorts.discard('type')
 
         self.category = safe_int_or_none(request.GET.get('category'))
         self.problem_visibility = safe_int_or_none(request.GET.get('problem_visibility'))
-        if 'type' in request.GET:
-            try:
-                self.selected_types = list(map(int, request.GET.getlist('type')))
-            except ValueError:
-                pass
 
         self.point_start = safe_float_or_none(request.GET.get('point_start'))
         self.point_end = safe_float_or_none(request.GET.get('point_end'))
@@ -502,7 +480,7 @@ class ProblemList(QueryStringSortMixin, TitleMixin, SolvedProblemMixin, ListView
             return generic_message(request, 'FTS syntax error', e.args[1], status=400)
 
     def post(self, request, *args, **kwargs):
-        to_update = ('hide_solved', 'show_types', 'full_text')
+        to_update = ('hide_solved', 'full_text')
         for key in to_update:
             if key in request.GET:
                 val = request.GET.get(key) == '1'
@@ -684,7 +662,6 @@ class ProblemClone(ProblemMixin, PermissionRequiredMixin, TitleMixin, SingleObje
 
         languages = problem.allowed_languages.all()
         language_limits = problem.language_limits.all()
-        types = problem.types.all()
         problem.pk = None
         problem.is_public = False
         problem.ac_rate = 0
@@ -694,6 +671,5 @@ class ProblemClone(ProblemMixin, PermissionRequiredMixin, TitleMixin, SingleObje
         problem.authors.add(self.request.profile)
         problem.allowed_languages.set(languages)
         problem.language_limits.set(language_limits)
-        problem.types.set(types)
 
         return HttpResponseRedirect(reverse('admin:judge_problem_change', args=(problem.id,)))
