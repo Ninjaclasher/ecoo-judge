@@ -15,7 +15,7 @@ from judge.feed import AtomBlogFeed, AtomCommentFeed, AtomProblemFeed, BlogFeed,
 from judge.forms import CustomAuthenticationForm
 from judge.sitemap import BlogPostSitemap, ContestSitemap, HomePageSitemap, OrganizationSitemap, ProblemSitemap, \
     SolutionSitemap, UrlSitemap, UserSitemap
-from judge.views import TitledTemplateView, api, blog, comment, contests, language, license, mailgun, organization, \
+from judge.views import TitledTemplateView, blog, comment, contests, language, license, mailgun, organization, \
     preview, problem, problem_manage, ranked_submission, register, stats, status, submission, tasks, ticket, totp, \
     user, widgets
 from judge.views.problem_data import ProblemDataView, ProblemSubmissionDiff, \
@@ -84,9 +84,6 @@ register_patterns = [
     url(r'^2fa/$', totp.TOTPLoginView.as_view(), name='login_2fa'),
     url(r'^2fa/enable/$', totp.TOTPEnableView.as_view(), name='enable_2fa'),
     url(r'^2fa/disable/$', totp.TOTPDisableView.as_view(), name='disable_2fa'),
-
-    url(r'api/token/generate/$', user.generate_api_token, name='generate_api_token'),
-    url(r'api/token/remove/$', user.remove_api_token, name='remove_api_token'),
 ]
 
 
@@ -258,19 +255,6 @@ urlpatterns = [
     url(r'^runtimes/$', language.LanguageList.as_view(), name='runtime_list'),
     url(r'^runtimes/matrix/$', status.version_matrix, name='version_matrix'),
     url(r'^status/$', status.status_all, name='status_all'),
-
-    url(r'^api/', include([
-        url(r'^contest/list$', api.api_v1_contest_list),
-        url(r'^contest/info/(\w+)$', api.api_v1_contest_detail),
-        url(r'^problem/list$', api.api_v1_problem_list),
-        url(r'^problem/info/(\w+)$', api.api_v1_problem_info),
-        url(r'^user/list$', api.api_v1_user_list),
-        url(r'^user/info/(\w+)$', api.api_v1_user_info),
-        url(r'^user/submissions/(\w+)$', api.api_v1_user_submissions),
-        url(r'^user/ratings/(\d+)$', api.api_v1_user_ratings),
-        url(r'^submission/info/(\d+)$', api.api_v1_submission_detail),
-        url(r'^submission/source/(\d+)$', api.api_v1_submission_source),
-    ])),
 
     url(r'^blog/', paged_list_view(blog.PostList, 'blog_post_list')),
     url(r'^post/(?P<id>\d+)-(?P<slug>.*)$', blog.PostView.as_view(), name='blog_post'),

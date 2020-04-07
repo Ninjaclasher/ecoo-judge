@@ -285,28 +285,6 @@ def edit_profile(request):
     })
 
 
-@require_POST
-@login_required
-def generate_api_token(request):
-    profile = request.profile
-    with transaction.atomic(), revisions.create_revision():
-        revisions.set_user(request.user)
-        revisions.set_comment(_('Generated API token for user'))
-        return JsonResponse({'data': {'token': profile.generate_api_token()}})
-
-
-@require_POST
-@login_required
-def remove_api_token(request):
-    profile = request.profile
-    with transaction.atomic(), revisions.create_revision():
-        profile.api_token = None
-        profile.save()
-        revisions.set_user(request.user)
-        revisions.set_comment(_('Removed API token for user'))
-    return JsonResponse({})
-
-
 class UserList(QueryStringSortMixin, DiggPaginatorMixin, TitleMixin, ListView):
     model = Profile
     title = gettext_lazy('Leaderboard')

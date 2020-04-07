@@ -120,10 +120,6 @@ class Profile(models.Model):
                                       help_text=_('32 character base32-encoded key for TOTP'),
                                       validators=[RegexValidator('^$|^[A-Z2-7]{32}$',
                                                                  _('TOTP key must be empty or base32'))])
-    api_token = models.CharField(max_length=64, null=True, verbose_name=_('API token'),
-                                 help_text=_('64 character hex-encoded API access token'),
-                                 validators=[RegexValidator('^[a-f0-9]{64}$',
-                                                            _('API token must be None or hexadecimal'))])
     notes = models.TextField(verbose_name=_('internal notes'), null=True, blank=True,
                              help_text=_('Notes for administrators regarding this user.'))
     is_external_user = models.BooleanField(verbose_name=_('external user'), default=False,
@@ -163,15 +159,6 @@ class Profile(models.Model):
         return points
 
     calculate_points.alters_data = True
-
-    def generate_api_token(self):
-        secret = secrets.token_bytes(32)
-        self.api_token = hmac.new(force_bytes(settings.SECRET_KEY), msg=secret, digestmod='sha256').hexdigest()
-        self.save(update_fields=['api_token'])
-        token = base64.urlsafe_b64encode(struct.pack('>I32s', self.user.id, secret))
-        return token.decode('utf-8')
-
-    generate_api_token.alters_data = True
 
     def remove_contest(self):
         self.current_contest = None

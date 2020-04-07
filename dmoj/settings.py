@@ -82,7 +82,6 @@ DMOJ_STATS_SUBMISSION_RESULT_COLORS = {
     'CE': '#42586d',
     'ERR': '#ffa71c',
 }
-DMOJ_API_PAGE_SIZE = 1000
 
 MARKDOWN_STYLES = {}
 MARKDOWN_DEFAULT_STYLE = {}
@@ -252,7 +251,6 @@ MIDDLEWARE = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
-    'judge.middleware.APIMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'judge.middleware.DMOJLoginMiddleware',
