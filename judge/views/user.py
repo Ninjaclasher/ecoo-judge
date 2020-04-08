@@ -20,7 +20,7 @@ from judge.models import Profile, Submission, Ticket
 from judge.utils.problems import contest_completed_ids, user_completed_ids
 from judge.utils.ranker import ranker
 from judge.utils.subscription import Subscription
-from judge.utils.views import DiggPaginatorMixin, QueryStringSortMixin, TitleMixin, generic_message
+from judge.utils.views import DiggPaginatorMixin, TitleMixin, generic_message
 from .contests import ContestRanking
 
 __all__ = ['UserPage', 'UserAboutPage', 'UserList', 'UserDashboard', 'users', 'edit_profile']
@@ -195,9 +195,7 @@ def user_ranking_redirect(request):
     except KeyError:
         raise Http404()
     user = get_object_or_404(Profile, user__username=username)
-    rank += Profile.objects.filter(
-        is_unlisted=False, id__lt=user.id,
-    ).count()
+    rank = Profile.objects.filter(is_unlisted=False, id__lt=user.id).count()
     page = rank // UserList.paginate_by
     return HttpResponseRedirect('%s%s#!%s' % (reverse('user_list'), '?page=%d' % (page + 1) if page else '', username))
 

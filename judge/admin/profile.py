@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.forms import ModelForm
 from django.utils.html import format_html
-from django.utils.translation import gettext, gettext_lazy as _, ungettext
+from django.utils.translation import gettext, gettext_lazy as _
 from reversion.admin import VersionAdmin
 
 from judge.models import Profile
