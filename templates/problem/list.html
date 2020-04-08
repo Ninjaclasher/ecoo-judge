@@ -15,51 +15,6 @@
 {% endblock %}
 
 {% block js_media %}
-    {% compress js %}
-        <script>
-            $(function () {
-                var $form = $('form#filter-form');
-                var $search = $('#search');
-
-                function prep_form() {
-                    $search.prop('disabled', !$search.val());
-                }
-
-                function clean_submit() {
-                    prep_form();
-                    $form.submit();
-                }
-
-                // This is incredibly nasty to do but it's needed because otherwise the select2 steals the focus
-                $search.keypress(function (e) {
-                    if (e.keyCode == 13)
-                        $('#go').click();
-                });
-
-                $('#go').click(clean_submit);
-
-                $('input#full_text').click(function () {
-                    prep_form();
-                    ($('<form>').attr('action', window.location.pathname + '?' + $form.serialize())
-                        .append($('<input>').attr('type', 'hidden').attr('name', 'csrfmiddlewaretoken')
-                            .attr('value', $.cookie('csrftoken')))
-                        .attr('method', 'POST').appendTo($('body')).submit());
-                });
-
-                var info_float = $('.info-float');
-                var container = $('#content-right');
-                if (window.bad_browser) {
-                    container.css('float', 'right');
-                } else if (!featureTest('position', 'sticky')) {
-                    fix_div(info_float, 55);
-                    $(window).resize(function () {
-                        info_float.width(container.width());
-                    });
-                    info_float.width(container.width());
-                }
-            });
-        </script>
-    {% endcompress %}
     {% if request.in_contest %}
         {% compress js %}
             <script src="{{ static('libs/tablesorter.js') }}" type="text/javascript"></script>
@@ -111,13 +66,6 @@
 
     <div id="common-content">
         {% block before_table %}{% endblock %}
-        {% if not request.in_contest %}
-            <div id="content-right" class="problems">
-                <div class="info-float">
-                    {% include "problem/search-form.html" %}
-                </div>
-            </div>
-        {% endif %}
         <div id="content-left" class="problems">
             <table id="problem-table" class="table striped">
                 <thead>

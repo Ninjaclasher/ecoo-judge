@@ -6,19 +6,9 @@
             width: 100%;
         }
 
-        &.pp {
-            text-align: left;
-            padding-left: 1em;
-            width: 100%;
-        }
-
         &.users {
             text-align: left;
             padding: 0 1em;
-            white-space: nowrap;
-        }
-
-        &.ac-rate {
             white-space: nowrap;
         }
 
@@ -194,39 +184,4 @@ ul.problem-list {
     color: inherit;
     display: block;
     padding: 4px 10px;
-}
-
-#point-slider {
-    margin: 30px 15px 10px;
-    height: 10px;
-
-    .noUi-connect {
-        background: #3737B4;
-    }
-
-    .noUi-handle {
-        height: 20px;
-        width: 16px;
-        left: -8px;
-    }
-
-    .noUi-handle:before, .noUi-handle:after {
-        top: 3px;
-        height: 12px;
-    }
-
-    .noUi-handle:before {
-        left: 5px;
-    }
-
-    .noUi-handle:after {
-        left: 8px;
-    }
-
-    .noUi-tooltip {
-        height: 17px;
-        line-height: 13px;
-        padding: 0 3px;
-        font-size: 13px;
-    }
 }

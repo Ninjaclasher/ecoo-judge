@@ -342,15 +342,7 @@ class ProblemList(QueryStringSortMixin, TitleMixin, SolvedProblemMixin, ListView
                                    'points', 'partial', 'user_count')]
 
     def get_normal_queryset(self):
-        queryset = Problem.get_visible_problems(self.request.user)
-
-        if 'search' in self.request.GET:
-            self.search_query = query = ' '.join(self.request.GET.getlist('search')).strip()
-            if query:
-                queryset = queryset.filter(
-                    Q(code__icontains=query) | Q(name__icontains=query) |
-                    Q(translations__name__icontains=query, translations__language=self.request.LANGUAGE_CODE))
-        return queryset.distinct()
+        return Problem.get_visible_problems(self.request.user)
 
     def get_queryset(self):
         if self.in_contest:
@@ -360,7 +352,6 @@ class ProblemList(QueryStringSortMixin, TitleMixin, SolvedProblemMixin, ListView
 
     def get_context_data(self, **kwargs):
         context = super(ProblemList, self).get_context_data(**kwargs)
-        context['search_query'] = self.search_query
         context['completed_problem_ids'] = self.get_completed_problems()
         context['attempted_problems'] = self.get_attempted_problems()
 
@@ -371,23 +362,10 @@ class ProblemList(QueryStringSortMixin, TitleMixin, SolvedProblemMixin, ListView
             context['hide_contest_scoreboard'] = self.contest.hide_scoreboard
         return context
 
-    def GET_with_session(self, request, key):
-        if not request.GET:
-            return request.session.get(key, False)
-        return request.GET.get(key, None) == '1'
-
-    def setup_problem_list(self, request):
-        self.search_query = None
-
+    def get(self, request, *args, **kwargs):
         # This actually copies into the instance dictionary...
         self.all_sorts = set(self.all_sorts)
-
-    def get(self, request, *args, **kwargs):
-        self.setup_problem_list(request)
         return super(ProblemList, self).get(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        return HttpResponseRedirect(request.get_full_path())
 
 
 class LanguageTemplateAjax(View):
