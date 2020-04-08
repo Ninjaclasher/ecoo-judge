@@ -26,7 +26,7 @@ from django.views.generic.base import TemplateResponseMixin
 from django.views.generic.detail import SingleObjectMixin
 
 from judge.forms import ProblemCloneForm, ProblemSubmitForm
-from judge.models import ContestProblem, ContestSubmission, Judge, Language, Problem, ProblemGroup, \
+from judge.models import ContestProblem, ContestSubmission, Judge, Language, Problem, \
     ProblemTranslation, RuntimeVersion, Solution, Submission, SubmissionSource, \
     TranslatedProblemForeignKeyQuerySet
 from judge.pdf_problems import DefaultPdfMaker, HAS_PDF
@@ -286,7 +286,7 @@ class ProblemList(QueryStringSortMixin, TitleMixin, SolvedProblemMixin, ListView
     template_name = 'problem/list.html'
     paginate_by = 50
     sql_sort = frozenset(('points', 'ac_rate', 'user_count', 'code'))
-    manual_sort = frozenset(('name', 'group', 'solved'))
+    manual_sort = frozenset(('name', 'solved'))
     all_sorts = sql_sort | manual_sort
     default_desc = frozenset(('points', 'ac_rate', 'user_count'))
     default_sort = 'code'
@@ -306,8 +306,6 @@ class ProblemList(QueryStringSortMixin, TitleMixin, SolvedProblemMixin, ListView
                 queryset = queryset.order_by(self.order)
             elif sort_key == 'name':
                 queryset = queryset.order_by(self.order.replace('name', 'i18n_name'))
-            elif sort_key == 'group':
-                queryset = queryset.order_by(self.order + '__name')
             elif sort_key == 'solved':
                 if self.request.user.is_authenticated:
                     profile = self.request.profile
@@ -333,7 +331,7 @@ class ProblemList(QueryStringSortMixin, TitleMixin, SolvedProblemMixin, ListView
         return self.request.profile
 
     def get_contest_queryset(self):
-        queryset = self.profile.current_contest.contest.contest_problems.select_related('problem__group') \
+        queryset = self.profile.current_contest.contest.contest_problems \
             .defer('problem__description').order_by('problem__code') \
             .annotate(user_count=Count('submission__participation', distinct=True)) \
             .order_by('order')
@@ -345,21 +343,18 @@ class ProblemList(QueryStringSortMixin, TitleMixin, SolvedProblemMixin, ListView
             'code': p['problem__code'],
             'name': p['problem__name'],
             'i18n_name': p['i18n_name'],
-            'group': {'full_name': p['problem__group__full_name']},
             'points': p['points'],
             'partial': p['partial'],
             'user_count': p['user_count'],
         } for p in queryset.values('problem_id', 'problem__code', 'problem__name', 'i18n_name',
-                                   'problem__group__full_name', 'points', 'partial', 'user_count')]
+                                   'points', 'partial', 'user_count')]
 
     def get_normal_queryset(self):
-        queryset = Problem.get_visible_problems(self.request.user).select_related('group')
+        queryset = Problem.get_visible_problems(self.request.user)
 
         if self.profile is not None and self.hide_solved:
             queryset = queryset.exclude(id__in=Submission.objects.filter(user=self.profile, points=F('problem__points'))
                                         .values_list('problem__id', flat=True))
-        if self.category is not None:
-            queryset = queryset.filter(group__id=self.category)
 
         if self.request.user.has_perm('judge.see_private_problem'):
             filter = None
@@ -412,8 +407,6 @@ class ProblemList(QueryStringSortMixin, TitleMixin, SolvedProblemMixin, ListView
         if self.request.user.has_perm('judge.see_restricted_problem'):
             context['visibilities'][3] = 'Restricted'
 
-        context['category'] = self.category
-        context['categories'] = ProblemGroup.objects.all()
         context['has_fts'] = settings.ENABLE_FTS
         context['search_query'] = self.search_query
         context['completed_problem_ids'] = self.get_completed_problems()
@@ -459,13 +452,11 @@ class ProblemList(QueryStringSortMixin, TitleMixin, SolvedProblemMixin, ListView
         self.full_text = self.GET_with_session(request, 'full_text')
 
         self.search_query = None
-        self.category = None
         self.problem_visibility = None
 
         # This actually copies into the instance dictionary...
         self.all_sorts = set(self.all_sorts)
 
-        self.category = safe_int_or_none(request.GET.get('category'))
         self.problem_visibility = safe_int_or_none(request.GET.get('problem_visibility'))
 
         self.point_start = safe_float_or_none(request.GET.get('point_start'))

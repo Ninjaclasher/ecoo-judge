@@ -9,11 +9,10 @@ from judge.admin.problem import ProblemAdmin
 from judge.admin.profile import ProfileAdmin
 from judge.admin.runtime import JudgeAdmin, LanguageAdmin
 from judge.admin.submission import SubmissionAdmin
-from judge.admin.taxon import ProblemGroupAdmin
 from judge.admin.ticket import TicketAdmin
 from judge.models import BlogPost, Contest, ContestParticipation, \
     ContestRegistration, ContestTag, Judge, Language, License, MiscConfig, NavigationBar, \
-    Organization, OrganizationRequest, Problem, ProblemGroup, Profile, Submission, Ticket
+    Organization, OrganizationRequest, Problem, Profile, Submission, Ticket
 
 admin.site.register(BlogPost, BlogPostAdmin)
 admin.site.register(Contest, ContestAdmin)
@@ -31,7 +30,6 @@ admin.site.register(NavigationBar, NavigationBarAdmin)
 admin.site.register(Organization, OrganizationAdmin)
 admin.site.register(OrganizationRequest, OrganizationRequestAdmin)
 admin.site.register(Problem, ProblemAdmin)
-admin.site.register(ProblemGroup, ProblemGroupAdmin)
 admin.site.register(Profile, ProfileAdmin)
 admin.site.register(Submission, SubmissionAdmin)
 admin.site.register(Ticket, TicketAdmin)

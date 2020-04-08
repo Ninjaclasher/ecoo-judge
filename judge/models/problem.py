@@ -15,21 +15,8 @@ from judge.models.profile import Organization, Profile
 from judge.models.runtime import Language
 from judge.utils.raw_sql import RawSQLColumn, unique_together_left_join
 
-__all__ = ['ProblemGroup', 'Problem', 'ProblemTranslation', 'ProblemClarification',
+__all__ = ['Problem', 'ProblemTranslation', 'ProblemClarification',
            'License', 'Solution', 'TranslatedProblemQuerySet', 'TranslatedProblemForeignKeyQuerySet']
-
-
-class ProblemGroup(models.Model):
-    name = models.CharField(max_length=20, verbose_name=_('problem group ID'), unique=True)
-    full_name = models.CharField(max_length=100, verbose_name=_('problem group name'))
-
-    def __str__(self):
-        return self.full_name
-
-    class Meta:
-        ordering = ['full_name']
-        verbose_name = _('problem group')
-        verbose_name_plural = _('problem groups')
 
 
 class License(models.Model):
@@ -94,8 +81,6 @@ class Problem(models.Model):
     testers = models.ManyToManyField(Profile, verbose_name=_('testers'), blank=True, related_name='tested_problems',
                                      help_text=_(
                                          'These users will be able to view the private problem, but not edit it.'))
-    group = models.ForeignKey(ProblemGroup, verbose_name=_('problem group'), on_delete=CASCADE,
-                              help_text=_('The group of problem, shown under Category in the problem list.'))
     time_limit = models.FloatField(verbose_name=_('time limit'),
                                    help_text=_('The time limit for this problem, in seconds. '
                                                'Fractional seconds (e.g. 1.5) are supported.'),

@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 
-from judge.models import Problem, ProblemGroup
+from judge.models import Problem
 
 
 class Command(BaseCommand):
@@ -10,12 +10,10 @@ class Command(BaseCommand):
         parser.add_argument('code', help='problem code')
         parser.add_argument('name', help='problem title')
         parser.add_argument('body', help='problem description')
-        parser.add_argument('group', help='problem group')
 
     def handle(self, *args, **options):
         problem = Problem()
         problem.code = options['code']
         problem.name = options['name']
         problem.description = options['body']
-        problem.group = ProblemGroup.objects.get(name=options['group'])
         problem.save()

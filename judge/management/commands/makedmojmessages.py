@@ -121,6 +121,3 @@ msgstr ""
                 if self.verbosity > 2:
                     self.stdout.write('processing navigation item label "%s"\n' % label)
                 self._emit_message(potfile, label)
-
-            if self.verbosity > 1:
-                self.stdout.write('processing problem types')

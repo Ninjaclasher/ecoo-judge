@@ -1,10 +1,5 @@
 #problem-table {
     td {
-        &.category {
-            text-align: left;
-            padding: 0 1em;
-        }
-
         &.problem {
             text-align: left;
             padding-left: 1em;
@@ -55,16 +50,13 @@
     }
 }
 
-label[for="category"], label[for="type"], label[for="problem_visibility"] {
+label[for="problem_visibility"] {
     padding-bottom: 0.25em;
     display: block;
 }
 
-#category, #problem_visibility {
+#problem_visibility {
     margin-top: 0.5em;
-}
-
-#category, #problem_visibility {
     width: 100%;
     visibility: hidden;
 }

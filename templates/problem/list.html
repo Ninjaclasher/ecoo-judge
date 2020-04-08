@@ -2,12 +2,6 @@
 
 {% block media %}
     <link rel="stylesheet" href="{{ static('libs/nouislider.min.css') }}">
-    <noscript>
-        <style>#category {
-            visibility: visible;
-        }
-        </style>
-    </noscript>
     {% if not request.in_contest %}
         <style>
             #problem-table th {
@@ -46,12 +40,10 @@
             $(function () {
                 var $form = $('form#filter-form');
                 var $search = $('#search');
-                var $category = $('#category');
                 var $problem_visibility = $('#problem_visibility');
 
                 function prep_form() {
                     $search.prop('disabled', !$search.val());
-                    $category.prop('disabled', !$category.val());
                     $problem_visibility.prop('disabled', !$problem_visibility.val());
                 }
 
@@ -60,7 +52,6 @@
                     $form.submit();
                 }
 
-                $category.select2().css({'visibility': 'visible'}).change(clean_submit);
                 $problem_visibility.select2().css({'visibility': 'visible'}).change(clean_submit);
 
                 // This is incredibly nasty to do but it's needed because otherwise the select2 steals the focus
@@ -205,7 +196,6 @@
                             <th class="solved"><i class="fa fa-check"></i></th>
                         {% endif %}
                         <th class="problem">{{ _('Problem') }}</th>
-                        <th class="category">{{ _('Category') }}</th>
                         <th class="points">{{ _('Points') }}</th>
                         <th class="users">{{ _('Users') }}</th>
                     {% else %}
@@ -217,9 +207,6 @@
                         {% endif %}
                         <th class="problem">
                             <a href="{{ sort_links.name }}">{{ _('Problem') }}{{ sort_order.name }}</a>
-                        </th>
-                        <th class="category">
-                            <a href="{{ sort_links.group }}">{{ _('Category') }}{{ sort_order.group }}</a>
                         </th>
                         <th class="points">
                             <a href="{{ sort_links.points }}">{{ _('Points') }}{{ sort_order.points }}</a>
@@ -270,7 +257,6 @@
                         <td class="problem">
                             <a href="{{ url('problem_detail', problem.code) }}">{{ problem.i18n_name }}</a>
                         </td>
-                        <td class="category">{{ problem.group.full_name }}</td>
                         <td class="p">{{ problem.points|floatformat }}{% if problem.partial %}p{% endif %}</td>
                         {% if not request.in_contest %}
                             <td class="ac-rate">{{ problem.ac_rate|floatformat(1) }}%</td>
