@@ -116,8 +116,8 @@
             {{ _('Submit solution') }}
         </a>
     {% endif %}
-    <br>
     {% if request.user.is_authenticated %}
+        <br>
         <a href="{{ url('new_problem_ticket', problem.code) }}" class="unselectale button full">
         {%- if contest_problem and contest_problem.contest.use_clarifications and request.profile.current_contest.live -%}
             {{ _('Request clarification') }}
