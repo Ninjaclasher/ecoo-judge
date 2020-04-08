@@ -232,7 +232,6 @@ urlpatterns = [
             url(r'^default$', preview.DefaultMarkdownPreviewView.as_view(), name='default_preview'),
             url(r'^problem$', preview.ProblemMarkdownPreviewView.as_view(), name='problem_preview'),
             url(r'^blog$', preview.BlogMarkdownPreviewView.as_view(), name='blog_preview'),
-            url(r'^comment$', preview.CommentMarkdownPreviewView.as_view(), name='comment_preview'),
             url(r'^contest$', preview.ContestMarkdownPreviewView.as_view(), name='contest_preview'),
             url(r'^flatpage$', preview.FlatPageMarkdownPreviewView.as_view(), name='flatpage_preview'),
             url(r'^profile$', preview.ProfileMarkdownPreviewView.as_view(), name='profile_preview'),
@@ -295,7 +294,5 @@ handler404 = 'judge.views.error.error404'
 handler403 = 'judge.views.error.error403'
 handler500 = 'judge.views.error.error500'
 
-if 'newsletter' in settings.INSTALLED_APPS:
-    urlpatterns.append(url(r'^newsletter/', include('newsletter.urls')))
 if 'impersonate' in settings.INSTALLED_APPS:
     urlpatterns.append(url(r'^impersonate/', include('impersonate.urls')))

@@ -10,7 +10,6 @@ from django.utils.translation import gettext_lazy as _
 
 from django_ace import AceWidget
 from judge.models import Contest, Language, PrivateMessage, Problem, Profile, Submission
-from judge.utils.subscription import newsletter_id
 from judge.widgets import MathJaxPagedownWidget, PagedownWidget, \
     Select2Widget
 
@@ -20,9 +19,6 @@ def fix_unicode(string, unsafe=tuple('\u202a\u202b\u202d\u202e')):
 
 
 class ProfileForm(ModelForm):
-    if newsletter_id is not None:
-        newsletter = forms.BooleanField(label=_('Subscribe to contest updates'), initial=False, required=False)
-
     class Meta:
         model = Profile
         fields = ['timezone', 'language', 'ace_theme']

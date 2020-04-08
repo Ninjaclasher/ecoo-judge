@@ -26,10 +26,6 @@ class ContestMarkdownPreviewView(MarkdownPreviewView):
     template_name = 'contest/preview.html'
 
 
-class CommentMarkdownPreviewView(MarkdownPreviewView):
-    template_name = 'comments/preview.html'
-
-
 class FlatPageMarkdownPreviewView(MarkdownPreviewView):
     template_name = 'flatpage-preview.html'
 

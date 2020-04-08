@@ -69,7 +69,7 @@ class LanguageLimitInline(admin.TabularInline):
 
 class ProblemClarificationForm(ModelForm):
     class Meta:
-        widgets = {'description': AdminMartorWidget(attrs={'data-markdownfy-url': reverse_lazy('comment_preview')})}
+        widgets = {'description': AdminMartorWidget(attrs={'data-markdownfy-url': reverse_lazy('problem_preview')})}
 
 
 class ProblemClarificationInline(admin.StackedInline):

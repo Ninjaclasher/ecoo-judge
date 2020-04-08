@@ -15,10 +15,9 @@ from django.utils.translation import gettext as _, gettext_lazy
 from django.views.generic import DetailView, ListView, TemplateView
 from reversion import revisions
 
-from judge.forms import ProfileForm, newsletter_id
+from judge.forms import ProfileForm
 from judge.models import Profile, Submission, Ticket
 from judge.utils.problems import contest_completed_ids, user_completed_ids
-from judge.utils.subscription import Subscription
 from judge.utils.views import DiggPaginatorMixin, TitleMixin, generic_message
 from .contests import ContestRanking
 
@@ -120,26 +119,9 @@ def edit_profile(request):
                 revisions.set_user(request.user)
                 revisions.set_comment(_('Updated on site'))
 
-            if newsletter_id is not None:
-                try:
-                    subscription = Subscription.objects.get(user=request.user, newsletter_id=newsletter_id)
-                except Subscription.DoesNotExist:
-                    if form.cleaned_data['newsletter']:
-                        Subscription(user=request.user, newsletter_id=newsletter_id, subscribed=True).save()
-                else:
-                    if subscription.subscribed != form.cleaned_data['newsletter']:
-                        subscription.update(('unsubscribe', 'subscribe')[form.cleaned_data['newsletter']])
-
             return HttpResponseRedirect(request.path)
     else:
         form = ProfileForm(instance=profile)
-        if newsletter_id is not None:
-            try:
-                subscription = Subscription.objects.get(user=request.user, newsletter_id=newsletter_id)
-            except Subscription.DoesNotExist:
-                form.fields['newsletter'].initial = False
-            else:
-                form.fields['newsletter'].initial = subscription.subscribed
 
     tzmap = settings.TIMEZONE_MAP
     return render(request, 'user/edit-profile.html', {
