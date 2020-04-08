@@ -40,19 +40,15 @@
             $(function () {
                 var $form = $('form#filter-form');
                 var $search = $('#search');
-                var $problem_visibility = $('#problem_visibility');
 
                 function prep_form() {
                     $search.prop('disabled', !$search.val());
-                    $problem_visibility.prop('disabled', !$problem_visibility.val());
                 }
 
                 function clean_submit() {
                     prep_form();
                     $form.submit();
                 }
-
-                $problem_visibility.select2().css({'visibility': 'visible'}).change(clean_submit);
 
                 // This is incredibly nasty to do but it's needed because otherwise the select2 steals the focus
                 $search.keypress(function (e) {

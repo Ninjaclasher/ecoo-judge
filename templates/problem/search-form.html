@@ -6,34 +6,11 @@
                 <input id="search" type="text" name="search" value="{{ search_query or '' }}"
                        placeholder="{{ _('Search problems...') }}">
             </div>
-            {% if has_fts %}
-                <div>
-                    <input id="full_text" type="checkbox" name="full_text" value="1"
-                           {% if full_text %}checked{% endif %}>
-                    <label for="full_text">{{ _('Full text search') }}</label>
-                </div>
-            {% endif %}
             {% if request.user.is_authenticated %}
                 <div>
                     <input id="hide_solved" type="checkbox" name="hide_solved" value="1"
                            {% if hide_solved %}checked{% endif %}>
                     <label for="hide_solved">{{ _('Hide solved problems') }}</label>
-                </div>
-            {% endif %}
-            {% if perms.judge.see_private_problem %}
-                <div class="filter-form-group">
-                    <label for="problem_visibility"><i>{{ _('Problem Visibility') }}</i></label>
-                    <select id="problem_visibility" name="problem_visibility">
-                        {% if problem_visibility %}
-                            <option value="" selected="selected">{{ _('All') }}</option>
-                        {% else %}
-                            <option value="">{{ _('All') }}</option>{% endif %}
-                        {% for id, name in visibilities.items() %}
-                            <option value="{{ id }}"{% if id == problem_visibility %} selected{% endif %}>
-                                {{ name }}
-                            </option>
-                        {% endfor %}
-                    </select>
                 </div>
             {% endif %}
             {% if point_values %}

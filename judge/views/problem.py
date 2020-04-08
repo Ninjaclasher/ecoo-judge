@@ -356,32 +356,12 @@ class ProblemList(QueryStringSortMixin, TitleMixin, SolvedProblemMixin, ListView
             queryset = queryset.exclude(id__in=Submission.objects.filter(user=self.profile, points=F('problem__points'))
                                         .values_list('problem__id', flat=True))
 
-        if self.request.user.has_perm('judge.see_private_problem'):
-            filter = None
-            see_restricted = self.request.user.has_perm('judge.see_restricted_problem')
-            if self.problem_visibility == 1:
-                filter = Q(is_public=True)
-            elif self.problem_visibility == 2:
-                filter = Q(is_public=False)
-                if see_restricted:
-                    filter &= Q(is_restricted=False)
-            elif self.problem_visibility == 3 and see_restricted:
-                filter = Q(is_restricted=True, is_public=False)
-            elif see_restricted:
-                filter = Q(is_restricted=False) | Q(is_public=True)
-
-            if filter is not None:
-                queryset = queryset.filter(filter)
-
         if 'search' in self.request.GET:
             self.search_query = query = ' '.join(self.request.GET.getlist('search')).strip()
             if query:
-                if settings.ENABLE_FTS and self.full_text:
-                    queryset = queryset.search(query, queryset.BOOLEAN).extra(order_by=['-relevance'])
-                else:
-                    queryset = queryset.filter(
-                        Q(code__icontains=query) | Q(name__icontains=query) |
-                        Q(translations__name__icontains=query, translations__language=self.request.LANGUAGE_CODE))
+                queryset = queryset.filter(
+                    Q(code__icontains=query) | Q(name__icontains=query) |
+                    Q(translations__name__icontains=query, translations__language=self.request.LANGUAGE_CODE))
         self.prepoint_queryset = queryset
         if self.point_start is not None:
             queryset = queryset.filter(points__gte=self.point_start)
@@ -398,16 +378,6 @@ class ProblemList(QueryStringSortMixin, TitleMixin, SolvedProblemMixin, ListView
     def get_context_data(self, **kwargs):
         context = super(ProblemList, self).get_context_data(**kwargs)
         context['hide_solved'] = 0 if self.in_contest else int(self.hide_solved)
-        context['full_text'] = 0 if self.in_contest else int(self.full_text)
-        context['problem_visibility'] = self.problem_visibility
-        context['visibilities'] = {
-            1: 'Public',
-            2: 'Private',
-        }
-        if self.request.user.has_perm('judge.see_restricted_problem'):
-            context['visibilities'][3] = 'Restricted'
-
-        context['has_fts'] = settings.ENABLE_FTS
         context['search_query'] = self.search_query
         context['completed_problem_ids'] = self.get_completed_problems()
         context['attempted_problems'] = self.get_attempted_problems()
@@ -449,29 +419,21 @@ class ProblemList(QueryStringSortMixin, TitleMixin, SolvedProblemMixin, ListView
 
     def setup_problem_list(self, request):
         self.hide_solved = self.GET_with_session(request, 'hide_solved')
-        self.full_text = self.GET_with_session(request, 'full_text')
 
         self.search_query = None
-        self.problem_visibility = None
 
         # This actually copies into the instance dictionary...
         self.all_sorts = set(self.all_sorts)
-
-        self.problem_visibility = safe_int_or_none(request.GET.get('problem_visibility'))
 
         self.point_start = safe_float_or_none(request.GET.get('point_start'))
         self.point_end = safe_float_or_none(request.GET.get('point_end'))
 
     def get(self, request, *args, **kwargs):
         self.setup_problem_list(request)
-
-        try:
-            return super(ProblemList, self).get(request, *args, **kwargs)
-        except ProgrammingError as e:
-            return generic_message(request, 'FTS syntax error', e.args[1], status=400)
+        return super(ProblemList, self).get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        to_update = ('hide_solved', 'full_text')
+        to_update = ('hide_solved',)
         for key in to_update:
             if key in request.GET:
                 val = request.GET.get(key) == '1'
