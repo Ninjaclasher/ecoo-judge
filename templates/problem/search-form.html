@@ -6,13 +6,6 @@
                 <input id="search" type="text" name="search" value="{{ search_query or '' }}"
                        placeholder="{{ _('Search problems...') }}">
             </div>
-            {% if request.user.is_authenticated %}
-                <div>
-                    <input id="hide_solved" type="checkbox" name="hide_solved" value="1"
-                           {% if hide_solved %}checked{% endif %}>
-                    <label for="hide_solved">{{ _('Hide solved problems') }}</label>
-                </div>
-            {% endif %}
             {% if point_values %}
                 <div class="form-label">{{ _('Point range') }}</div>
                 <div id="point-slider"></div>
@@ -21,7 +14,6 @@
             <input id="point-end" type="hidden" name="point_end" {% if point_end and point_end != point_values.max %}value="{{ point_end }}"{% else %}disabled{% endif %}>
             <div class="form-submit-group">
                 <a id="go" class="button">{{ _('Go') }}</a>
-                <a id="random" class="button">{{ _('Random') }}</a>
             </div>
         </form>
     </div>
