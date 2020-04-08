@@ -241,7 +241,6 @@ class DjangoJudgeHandler(JudgeHandler):
         ))
 
         submission.user._updating_stats_only = True
-        submission.user.calculate_points()
         problem._updating_stats_only = True
         problem.update_stats()
         submission.update_contest()

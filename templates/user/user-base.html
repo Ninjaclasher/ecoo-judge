@@ -38,15 +38,6 @@
             </div>
             <br>
 
-            <div><b>
-                {%- trans trimmed counter=user.problem_count %}
-                    {{ counter }} problem solved
-                {% pluralize %}
-                    {{ counter }} problems solved
-                {% endtrans -%}
-            </b></div>
-
-            <br>
             <div>
                 <a href="{{ url('all_user_submissions', user.user.username) }}">{{ _('View submissions') }}</a>
             </div>

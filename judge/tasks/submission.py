@@ -52,16 +52,4 @@ def rescore_problem(self, problem_id):
             rescored += 1
             if rescored % 10 == 0:
                 p.done = rescored
-
-    with Progress(self, submissions.values('user_id').distinct().count(), stage=_('Recalculating user points')) as p:
-        users = 0
-        profiles = Profile.objects.filter(id__in=submissions.values_list('user_id', flat=True).distinct())
-        for profile in profiles.iterator():
-            profile._updating_stats_only = True
-            profile.calculate_points()
-            cache.delete('user_complete:%d' % profile.id)
-            cache.delete('user_attempted:%d' % profile.id)
-            users += 1
-            if users % 10 == 0:
-                p.done = users
     return rescored

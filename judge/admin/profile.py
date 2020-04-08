@@ -53,7 +53,6 @@ class ProfileAdmin(NoBatchDeleteMixin, VersionAdmin):
     ordering = ('user__username',)
     search_fields = ('user__username', 'user__first_name', 'user__last_name', 'ip', 'user__email')
     list_filter = ('language', TimezoneFilter)
-    actions = ('recalculate_points',)
     actions_on_top = True
     actions_on_bottom = True
 
@@ -96,16 +95,6 @@ class ProfileAdmin(NoBatchDeleteMixin, VersionAdmin):
         return obj.user.date_joined
     date_joined.admin_order_field = 'user__date_joined'
     date_joined.short_description = _('date joined')
-
-    def recalculate_points(self, request, queryset):
-        count = 0
-        for profile in queryset:
-            profile.calculate_points()
-            count += 1
-        self.message_user(request, ungettext('%d user have scores recalculated.',
-                                             '%d users have scores recalculated.',
-                                             count) % count)
-    recalculate_points.short_description = _('Recalculate scores')
 
     def get_form(self, request, obj=None, **kwargs):
         form = super(ProfileAdmin, self).get_form(request, obj, **kwargs)

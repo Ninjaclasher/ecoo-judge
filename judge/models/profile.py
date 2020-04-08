@@ -73,7 +73,6 @@ class Profile(models.Model):
                                 default=settings.DEFAULT_USER_TIME_ZONE)
     language = models.ForeignKey('Language', verbose_name=_('preferred language'), on_delete=models.SET_DEFAULT,
                                  default=Language.get_default_language_pk)
-    problem_count = models.IntegerField(default=0, db_index=True)
     ace_theme = models.CharField(max_length=30, choices=ACE_THEMES, default='github')
     last_access = models.DateTimeField(verbose_name=_('last access time'), default=now)
     ip = models.GenericIPAddressField(verbose_name=_('last IP'), blank=True, null=True)
@@ -103,17 +102,6 @@ class Profile(models.Model):
     @cached_property
     def username(self):
         return self.user.username
-
-    def calculate_points(self):
-        problems = (
-            Problem.get_public_problems().filter(submission__user=self, submission__points__isnull=False)
-                   .annotate(max_points=Max('submission__points')).order_by('-max_points')
-                   .values_list('max_points', flat=True).filter(max_points__gt=0).count()
-        )
-        if problems != self.problem_count:
-            self.problem_count = problems
-            self.save(update_fields=['problem_count'])
-        return points
 
     def remove_contest(self):
         self.current_contest = None

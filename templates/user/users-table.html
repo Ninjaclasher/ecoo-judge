@@ -1,13 +1,1 @@
 {% extends "user/base-users-table.html" %}
-
-{% block after_point_head %}
-    <th class="problems">
-        {% if sort_links %}<a href="{{ sort_links.problem_count }}">{% endif %}
-        {{ _('Problems') }}
-        {%- if sort_links %}{{ sort_order.problem_count }}</a>{% endif %}
-    </th>
-{% endblock %}
-
-{% block after_point %}
-    <td>{{ user.problem_count }}</td>
-{% endblock %}

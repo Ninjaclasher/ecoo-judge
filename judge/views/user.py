@@ -151,27 +151,22 @@ def edit_profile(request):
     })
 
 
-class UserList(QueryStringSortMixin, DiggPaginatorMixin, TitleMixin, ListView):
+class UserList(DiggPaginatorMixin, TitleMixin, ListView):
     model = Profile
     title = gettext_lazy('Leaderboard')
     context_object_name = 'users'
     template_name = 'user/list.html'
     paginate_by = 100
-    all_sorts = frozenset(('problem_count',))
-    default_desc = all_sorts
-    default_sort = '-problem_count'
 
     def get_queryset(self):
         return (Profile.objects.filter(is_unlisted=False)
-                .order_by(self.order, 'id').select_related('user')
-                .only('display_rank', 'user__username', 'problem_count'))
+                .order_by('id').select_related('user')
+                .only('display_rank', 'user__username'))
 
     def get_context_data(self, **kwargs):
         context = super(UserList, self).get_context_data(**kwargs)
         context['users'] = ranker(context['users'], rank=self.paginate_by * (context['page_obj'].number - 1))
         context['first_page_href'] = '.'
-        context.update(self.get_sort_context())
-        context.update(self.get_sort_paginate_context())
         return context
 
 
@@ -200,11 +195,8 @@ def user_ranking_redirect(request):
     except KeyError:
         raise Http404()
     user = get_object_or_404(Profile, user__username=username)
-    rank = Profile.objects.filter(
-        is_unlisted=False, problem_count__gt=user.problem_count,
-    ).count()
     rank += Profile.objects.filter(
-        is_unlisted=False, problem_count__exact=user.problem_count, id__lt=user.id,
+        is_unlisted=False, id__lt=user.id,
     ).count()
     page = rank // UserList.paginate_by
     return HttpResponseRedirect('%s%s#!%s' % (reverse('user_list'), '?page=%d' % (page + 1) if page else '', username))
