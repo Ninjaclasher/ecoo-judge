@@ -11,7 +11,7 @@ from django.views.generic import RedirectView
 from martor.views import markdown_search_user
 
 from judge.forms import CustomAuthenticationForm
-from judge.views import TitledTemplateView, blog, contests, language, mailgun, organization, \
+from judge.views import TitledTemplateView, blog, contests, language, organization, \
     preview, problem, problem_manage, ranked_submission, register, status, submission, tasks, ticket, \
     user, widgets
 from judge.views.problem_data import ProblemDataView, ProblemSubmissionDiff, \
@@ -208,8 +208,6 @@ urlpatterns = [
 
     url(r'^blog/', paged_list_view(blog.PostList, 'blog_post_list')),
     url(r'^post/(?P<id>\d+)-(?P<slug>.*)$', blog.PostView.as_view(), name='blog_post'),
-
-    url(r'^mailgun/mail_activate/$', mailgun.MailgunActivationView.as_view(), name='mailgun_activate'),
 
     url(r'^widgets/', include([
         url(r'^rejudge$', widgets.rejudge_submission, name='submission_rejudge'),
