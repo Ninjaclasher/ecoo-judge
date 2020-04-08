@@ -12,7 +12,7 @@ from martor.views import markdown_search_user
 
 from judge.forms import CustomAuthenticationForm
 from judge.views import TitledTemplateView, blog, contests, language, organization, \
-    preview, problem, problem_manage, ranked_submission, register, status, submission, tasks, ticket, \
+    preview, problem, problem_manage, ranked_submission, status, submission, tasks, ticket, \
     user, widgets
 from judge.views.problem_data import ProblemDataView, ProblemSubmissionDiff, \
     problem_data_file, problem_init_view
