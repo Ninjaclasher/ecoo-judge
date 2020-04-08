@@ -64,8 +64,8 @@ class SubmissionTestCaseInline(admin.TabularInline):
 
 
 class ContestSubmissionInline(admin.StackedInline):
-    fields = ('problem', 'participation', 'points', 'bonus', 'is_disqualified', 'updated_frozen')
-    readonly_fields = ('updated_frozen', 'is_disqualified')
+    fields = ('problem', 'participation', 'points', 'bonus', 'updated_frozen')
+    readonly_fields = ('updated_frozen',)
     model = ContestSubmission
 
     def get_readonly_fields(self, request, obj=None):
@@ -254,7 +254,6 @@ class SubmissionAdmin(admin.ModelAdmin):
     def get_urls(self):
         return [
             url(r'^(\d+)/judge/$', self.judge_view, name='judge_submission_rejudge'),
-            url(r'^(\d+)/disqualify/$', self.disqualify_view, name='judge_submission_disqualify'),
         ] + super(SubmissionAdmin, self).get_urls()
 
     def judge_view(self, request, id):
@@ -266,14 +265,3 @@ class SubmissionAdmin(admin.ModelAdmin):
             raise PermissionDenied()
         submission.judge(rejudge=True)
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
-
-    def disqualify_view(self, request, id):
-        if not request.user.has_perm('judge.disqualify_submission'):
-            raise PermissionDenied()
-        submission = get_object_or_404(Submission, id=id)
-        if submission.contest_or_none is None:
-            raise Http404()
-        submission.contest.is_disqualified = not submission.contest.is_disqualified
-        submission.contest.save()
-        submission.contest.participation.recompute_results()
-        return HttpResponseRedirect(reverse('admin:judge_submission_change', args=(id,)))
