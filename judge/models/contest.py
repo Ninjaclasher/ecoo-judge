@@ -73,9 +73,6 @@ class Contest(models.Model):
                                                       help_text=('Whether the scoreboard should remain hidden '
                                                                  'permanently. Requires "hide scoreboard" to be '
                                                                  'set as well to have any effect.'))
-    view_contest_scoreboard = models.ManyToManyField(Profile, verbose_name=_('view contest scoreboard'), blank=True,
-                                                     related_name='view_contest_scoreboard',
-                                                     help_text=_('These users will be able to view the scoreboard.'))
     use_clarifications = models.BooleanField(verbose_name=_('no comments'),
                                              help_text=_("Use clarification system instead of comments."),
                                              default=True)
@@ -180,8 +177,6 @@ class Contest(models.Model):
             return True
         if not self.is_accessible_by(user):
             return False
-        if user.is_authenticated and self.view_contest_scoreboard.filter(id=user.profile.id).exists():
-            return True
         if not self.show_scoreboard:
             return False
         return True
@@ -279,9 +274,6 @@ class Contest(models.Model):
             return
 
         if user.is_authenticated:
-            if self.view_contest_scoreboard.filter(id=user.profile.id).exists():
-                return
-
             in_org = self.organizations.filter(id__in=user.profile.organizations.all()).exists()
             in_users = self.private_contestants.filter(id=user.profile.id).exists()
         else:
@@ -348,7 +340,6 @@ class Contest(models.Model):
                 filter |= Q(is_private=True, is_private_viewable=True,
                             organizations__in=profile.organizations.all(),
                             private_contestants=profile)
-                filter |= Q(view_contest_scoreboard=profile)
             queryset = queryset.filter(filter)
         return queryset.distinct()
 
