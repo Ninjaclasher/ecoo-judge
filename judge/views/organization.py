@@ -18,7 +18,6 @@ from reversion import revisions
 
 from judge.forms import EditOrganizationForm
 from judge.models import BlogPost, Organization, OrganizationRequest, Problem, Profile
-from judge.utils.ranker import ranker
 from judge.utils.views import TitleMixin, generic_message
 
 __all__ = ['OrganizationList', 'OrganizationHome', 'OrganizationUsers', 'OrganizationMembershipChange',
@@ -103,8 +102,8 @@ class OrganizationUsers(OrganizationDetailView):
         context = super(OrganizationUsers, self).get_context_data(**kwargs)
         context['title'] = _('%s Members') % self.object.name
         context['users'] = \
-            ranker(self.object.members.filter(is_unlisted=False).order_by('id')
-                   .select_related('user').defer('notes'))
+            enumerate(self.object.members.filter(is_unlisted=False).order_by('id')
+                      .select_related('user').defer('notes'), 1)
         context['partial'] = True
         context['is_admin'] = self.can_edit_organization()
         context['kick_url'] = reverse('organization_user_kick', args=[self.object.id, self.object.slug])
