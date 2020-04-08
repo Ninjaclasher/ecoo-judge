@@ -25,7 +25,7 @@ from django.views.generic.detail import BaseDetailView, DetailView, SingleObject
 from judge import event_poster as event
 from judge.forms import ContestCloneForm
 from judge.models import Contest, ContestMoss, ContestParticipation, ContestProblem, \
-    ContestTag, Problem, Profile, Submission
+    Problem, Profile, Submission
 from judge.tasks import run_moss
 from judge.utils.celery import redirect_to_task_status
 from judge.utils.opengraph import generate_opengraph
@@ -70,7 +70,7 @@ class ContestList(DiggPaginatorMixin, TitleMixin, ContestListMixin, ListView):
 
     def _get_queryset(self):
         return super(ContestList, self).get_queryset() \
-            .order_by('-start_time', 'key').prefetch_related('tags', 'organizations', 'organizers')
+            .order_by('-start_time', 'key').prefetch_related('organizations', 'organizers')
 
     def get_queryset(self):
         return self._get_queryset().filter(end_time__lt=self._now)
@@ -228,7 +228,6 @@ class ContestClone(ContestMixin, TitleMixin, SingleObjectFormView):
     def form_valid(self, form):
         contest = self.object
 
-        tags = contest.tags.all()
         organizations = contest.organizations.all()
         private_contestants = contest.private_contestants.all()
         contest_problems = contest.contest_problems.all()
@@ -240,7 +239,6 @@ class ContestClone(ContestMixin, TitleMixin, SingleObjectFormView):
         contest.key = form.cleaned_data['key']
         contest.save()
 
-        contest.tags.set(tags)
         contest.organizations.set(organizations)
         contest.private_contestants.set(private_contestants)
         contest.organizers.add(self.request.profile)
@@ -671,17 +669,3 @@ class ContestMossDelete(ContestMossMixin, SingleObjectMixin, View):
         self.object = self.get_object()
         ContestMoss.objects.filter(contest=self.object).delete()
         return HttpResponseRedirect(reverse('contest_moss', args=(self.object.key,)))
-
-
-class ContestTagDetailAjax(DetailView):
-    model = ContestTag
-    slug_field = slug_url_kwarg = 'name'
-    context_object_name = 'tag'
-    template_name = 'contest/tag-ajax.html'
-
-
-class ContestTagDetail(TitleMixin, ContestTagDetailAjax):
-    template_name = 'contest/tag.html'
-
-    def get_title(self):
-        return _('Contest tag: %s') % self.object.name

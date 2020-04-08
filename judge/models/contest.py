@@ -15,36 +15,7 @@ from judge.models.problem import Problem
 from judge.models.profile import Organization, Profile
 from judge.models.submission import Submission
 
-__all__ = ['Contest', 'ContestTag', 'ContestParticipation', 'ContestProblem', 'ContestSubmission']
-
-
-class ContestTag(models.Model):
-    color_validator = RegexValidator('^#(?:[A-Fa-f0-9]{3}){1,2}$', _('Invalid colour.'))
-
-    name = models.CharField(max_length=20, verbose_name=_('tag name'), unique=True,
-                            validators=[RegexValidator(r'^[a-z-]+$', message=_('Lowercase letters and hyphens only.'))])
-    color = models.CharField(max_length=7, verbose_name=_('tag colour'), validators=[color_validator])
-    description = models.TextField(verbose_name=_('tag description'), blank=True)
-
-    def __str__(self):
-        return self.name
-
-    def get_absolute_url(self):
-        return reverse('contest_tag', args=[self.name])
-
-    @property
-    def text_color(self, cache={}):
-        if self.color not in cache:
-            if len(self.color) == 4:
-                r, g, b = [ord(bytes.fromhex(i * 2)) for i in self.color[1:]]
-            else:
-                r, g, b = [i for i in bytes.fromhex(self.color[1:])]
-            cache[self.color] = '#000' if 299 * r + 587 * g + 144 * b > 140000 else '#fff'
-        return cache[self.color]
-
-    class Meta:
-        verbose_name = _('contest tag')
-        verbose_name_plural = _('contest tags')
+__all__ = ['Contest', 'ContestParticipation', 'ContestProblem', 'ContestSubmission']
 
 
 class Contest(models.Model):
@@ -104,7 +75,6 @@ class Contest(models.Model):
                                            blank=True,
                                            help_text=_('This image will replace the default site logo for users '
                                                        'inside the contest.'))
-    tags = models.ManyToManyField(ContestTag, verbose_name=_('contest tags'), blank=True, related_name='contests')
     user_count = models.IntegerField(verbose_name=_('the amount of live participants'), default=0)
     summary = models.TextField(blank=True, verbose_name=_('contest summary'),
                                help_text=_('Plain-text, shown in meta description tag, e.g. for social media.'))

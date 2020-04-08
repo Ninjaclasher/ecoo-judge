@@ -33,23 +33,10 @@
                 count_down($(this));
             });
 
-            $('.contest-tag').find('a[data-featherlight]').featherlight();
-
             $('.join-warning').click(function () {
                 return confirm('{{ _('Are you sure you want to join?') }}\n' +
                     '{{ _('Joining a contest for the first time starts your timer, after which it becomes unstoppable.') }}');
             });
-
-            // var tooltip_classes = 'tooltipped tooltipped-e';
-            //
-            // $('.contest-tag').each(function () {
-            //     var link = $(this);//
-            //     link.mouseenter(function (e) {
-            //         link.addClass(tooltip_classes).attr('aria-label', link.attr('data-description'));
-            //     }).mouseleave(function (e) {
-            //         link.removeClass(tooltip_classes).removeAttr('aria-label');
-            //     });
-            // });
         });
     </script>
 {% endblock %}
@@ -86,15 +73,6 @@
                     <i class="fa fa-lock"></i> {{ _('private') }}
                 </span>
             {% endif %}
-            {% for tag in contest.tags.all() %}
-                <span style="background-color: {{ tag.color }}" class="contest-tag">
-                    <a href="{{ url('contest_tag', tag.name) }}"
-                       style="color: {{ tag.text_color }}"
-                       data-featherlight="{{ url('contest_tag_ajax', tag.name) }}">
-                        {{- tag.name -}}
-                    </a>
-                </span>
-            {% endfor %}
         </span>
     {% endspaceless %}
 {% endmacro %}

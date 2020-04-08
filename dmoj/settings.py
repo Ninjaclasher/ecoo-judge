@@ -162,7 +162,6 @@ else:
                     'icon': 'fa-bar-chart',
                     'children': [
                         'judge.ContestParticipation',
-                        'judge.ContestTag',
                     ],
                 },
                 {
@@ -381,7 +380,6 @@ MARKDOWN_STYLES = {
     'judge': MARKDOWN_ADMIN_EDITABLE_STYLE,
     'blog': MARKDOWN_ADMIN_EDITABLE_STYLE,
     'solution': MARKDOWN_ADMIN_EDITABLE_STYLE,
-    'contest_tag': MARKDOWN_ADMIN_EDITABLE_STYLE,
     'organization-about': MARKDOWN_USER_LARGE_STYLE,
     'ticket': MARKDOWN_USER_LARGE_STYLE,
 }
