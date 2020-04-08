@@ -277,10 +277,10 @@ class ProblemList(QueryStringSortMixin, TitleMixin, SolvedProblemMixin, ListView
     context_object_name = 'problems'
     template_name = 'problem/list.html'
     paginate_by = 50
-    sql_sort = frozenset(('points', 'ac_rate', 'user_count', 'code'))
+    sql_sort = frozenset(('ac_rate', 'user_count', 'code'))
     manual_sort = frozenset(('name', 'solved'))
     all_sorts = sql_sort | manual_sort
-    default_desc = frozenset(('points', 'ac_rate', 'user_count'))
+    default_desc = frozenset(('ac_rate', 'user_count'))
     default_sort = 'code'
 
     def get_paginator(self, queryset, per_page, orphans=0,

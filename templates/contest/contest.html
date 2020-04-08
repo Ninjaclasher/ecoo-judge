@@ -76,7 +76,6 @@
                 <thead>
                 <tr>
                     <th>{{ _('Problem') }}</th>
-                    <th>{{ _('Points') }}</th>
                     <th>{{ _('AC Rate') }}</th>
                     <th>{{ _('Users') }}</th>
                     <th></th>
@@ -93,7 +92,6 @@
                                     {{ problem.i18n_name }}
                                 {% endif %}
                             </td>
-                            <td>{{ problem.points|floatformat }}{% if problem.partial %}p{% endif %}</td>
                             <td>{{ problem.ac_rate|floatformat(1) }}%</td>
                             <td>
                                 {% if accessible %}

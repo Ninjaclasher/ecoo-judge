@@ -165,16 +165,14 @@
 
     <hr style="padding-top: 0.3em">
 
-    <div class="problem-info-entry">
-        <i class="fa fa-check fa-fw"></i><span class="pi-name">{{ _('Points:') }}</span>
-        <span class="pi-value">
-            {% if contest_problem %}
+    {% if contest_problem %}
+        <div class="problem-info-entry">
+            <i class="fa fa-check fa-fw"></i><span class="pi-name">{{ _('Points:') }}</span>
+            <span class="pi-value">
                 {{ contest_problem.points }}{% if contest_problem.partial %} {{ _('(partial)') }}{% endif %}
-            {% else %}
-                {{ problem.points|floatformat }}{% if problem.partial %} {{ _('(partial)') }}{% endif %}
-            {% endif %}
-        </span>
-    </div>
+            </span>
+        </div>
+    {% endif %}
     <div class="problem-info-entry">
         <i class="fa fa-clock-o fa-fw"></i><span class="pi-name">{{ _('Time limit:') }}</span>
         <span class="pi-value">{{ problem.time_limit }}s</span>
