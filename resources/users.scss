@@ -159,27 +159,6 @@ a.edit-profile {
     padding: 0 0.5em;
 }
 
-.hide-solved-problems {
-    text-align: right;
-    overflow: hidden;
-}
-
-.hide-solved-problems > span {
-    position: relative;
-    display: inline-block;
-}
-
-.hide-solved-problems > span:before {
-    content: "";
-    position: absolute;
-    top: 50%;
-    width: 100000px;
-    height: 1px;
-    background: rgba(0, 0, 0, 0.2);
-    right: 100%;
-    margin-right: 5px;
-}
-
 .user-info-page {
     display: flex;
     max-width: 100%;

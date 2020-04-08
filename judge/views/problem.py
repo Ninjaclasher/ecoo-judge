@@ -350,10 +350,6 @@ class ProblemList(QueryStringSortMixin, TitleMixin, SolvedProblemMixin, ListView
     def get_normal_queryset(self):
         queryset = Problem.get_visible_problems(self.request.user)
 
-        if self.profile is not None and self.hide_solved:
-            queryset = queryset.exclude(id__in=Submission.objects.filter(user=self.profile, points=F('problem__points'))
-                                        .values_list('problem__id', flat=True))
-
         if 'search' in self.request.GET:
             self.search_query = query = ' '.join(self.request.GET.getlist('search')).strip()
             if query:
@@ -375,7 +371,6 @@ class ProblemList(QueryStringSortMixin, TitleMixin, SolvedProblemMixin, ListView
 
     def get_context_data(self, **kwargs):
         context = super(ProblemList, self).get_context_data(**kwargs)
-        context['hide_solved'] = 0 if self.in_contest else int(self.hide_solved)
         context['search_query'] = self.search_query
         context['completed_problem_ids'] = self.get_completed_problems()
         context['attempted_problems'] = self.get_attempted_problems()
@@ -414,8 +409,6 @@ class ProblemList(QueryStringSortMixin, TitleMixin, SolvedProblemMixin, ListView
         return request.GET.get(key, None) == '1'
 
     def setup_problem_list(self, request):
-        self.hide_solved = self.GET_with_session(request, 'hide_solved')
-
         self.search_query = None
 
         # This actually copies into the instance dictionary...
@@ -429,13 +422,6 @@ class ProblemList(QueryStringSortMixin, TitleMixin, SolvedProblemMixin, ListView
         return super(ProblemList, self).get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        to_update = ('hide_solved',)
-        for key in to_update:
-            if key in request.GET:
-                val = request.GET.get(key) == '1'
-                request.session[key] = val
-            else:
-                request.session.pop(key, None)
         return HttpResponseRedirect(request.get_full_path())
 
 
@@ -446,20 +432,6 @@ class LanguageTemplateAjax(View):
         except ValueError:
             raise Http404()
         return HttpResponse(language.template, content_type='text/plain')
-
-
-class RandomProblem(ProblemList):
-    def get(self, request, *args, **kwargs):
-        self.setup_problem_list(request)
-        if self.in_contest:
-            raise Http404()
-
-        queryset = self.get_normal_queryset()
-        count = queryset.count()
-        if not count:
-            return HttpResponseRedirect('%s%s%s' % (reverse('problem_list'), request.META['QUERY_STRING'] and '?',
-                                                    request.META['QUERY_STRING']))
-        return HttpResponseRedirect(queryset[randrange(count)].get_absolute_url())
 
 
 user_logger = logging.getLogger('judge.user')
