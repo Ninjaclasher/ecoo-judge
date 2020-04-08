@@ -1,6 +1,5 @@
 from django.conf.urls import url
 from django.contrib import admin
-from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.db.models import Q, TextField
 from django.forms import ModelForm, ModelMultipleChoiceField
@@ -123,10 +122,8 @@ class ContestAdmin(NoBatchDeleteMixin, VersionAdmin):
     def get_actions(self, request):
         actions = super(ContestAdmin, self).get_actions(request)
 
-        if request.user.has_perm('judge.change_contest_visibility') or \
-                request.user.has_perm('judge.create_private_contest'):
-            for action in ('make_visible', 'make_hidden'):
-                actions[action] = self.get_action(action)
+        for action in ('make_visible', 'make_hidden'):
+            actions[action] = self.get_action(action)
 
         return actions
 
@@ -139,27 +136,11 @@ class ContestAdmin(NoBatchDeleteMixin, VersionAdmin):
 
     def get_readonly_fields(self, request, obj=None):
         readonly = []
-        if not request.user.has_perm('judge.contest_frozen_state') or (obj is not None and obj.freeze_submissions):
+        if obj is not None and obj.freeze_submissions:
             readonly += ['freeze_submissions']
-        if not request.user.has_perm('judge.contest_access_code'):
-            readonly += ['access_code']
-        if not request.user.has_perm('judge.create_private_contest'):
-            readonly += ['is_private', 'private_contestants', 'is_organization_private',
-                         'organizations', 'is_private_viewable']
-            if not request.user.has_perm('judge.change_contest_visibility'):
-                readonly += ['is_visible']
-        if not request.user.has_perm('judge.contest_problem_label'):
-            readonly += ['problem_label_script']
         return readonly
 
     def save_model(self, request, obj, form, change):
-        # `is_visible` will not appear in `cleaned_data` if user cannot edit it
-        if form.cleaned_data.get('is_visible') and not request.user.has_perm('judge.change_contest_visibility'):
-            if not form.cleaned_data['is_private'] and not form.cleaned_data['is_organization_private']:
-                raise PermissionDenied
-            if not request.user.has_perm('judge.create_private_contest'):
-                raise PermissionDenied
-
         super().save_model(request, obj, form, change)
         # We need this flag because `save_related` deals with the inlines, but does not know if we have already rescored
         self._rescored = False
@@ -174,7 +155,7 @@ class ContestAdmin(NoBatchDeleteMixin, VersionAdmin):
             self._rescore(form.cleaned_data['key'])
 
     def has_change_permission(self, request, obj=None):
-        if not request.user.has_perm('judge.edit_own_contest'):
+        if not request.user.has_perm('judge.change_contest'):
             return False
         if request.user.has_perm('judge.edit_all_contest') or obj is None:
             return True
@@ -185,8 +166,6 @@ class ContestAdmin(NoBatchDeleteMixin, VersionAdmin):
         transaction.on_commit(rescore_contest.s(contest_key).delay)
 
     def make_visible(self, request, queryset):
-        if not request.user.has_perm('judge.change_contest_visibility'):
-            queryset = queryset.filter(Q(is_private=True) | Q(is_organization_private=True))
         count = queryset.update(is_visible=True)
         self.message_user(request, ungettext('%d contest successfully marked as visible.',
                                              '%d contests successfully marked as visible.',
@@ -194,8 +173,6 @@ class ContestAdmin(NoBatchDeleteMixin, VersionAdmin):
     make_visible.short_description = _('Mark contests as visible')
 
     def make_hidden(self, request, queryset):
-        if not request.user.has_perm('judge.change_contest_visibility'):
-            queryset = queryset.filter(Q(is_private=True) | Q(is_organization_private=True))
         count = queryset.update(is_visible=True)
         self.message_user(request, ungettext('%d contest successfully marked as hidden.',
                                              '%d contests successfully marked as hidden.',
@@ -219,8 +196,6 @@ class ContestAdmin(NoBatchDeleteMixin, VersionAdmin):
         return HttpResponseRedirect(reverse('admin:judge_contest_change', args=(contest_id,)))
 
     def unfreeze_view(self, request, id):
-        if not request.user.has_perm('judge.contest_frozen_state'):
-            raise PermissionDenied()
         contest = get_object_or_404(Contest, id=id)
         if not contest.freeze_submissions:
             raise Http404()
@@ -239,7 +214,7 @@ class ContestAdmin(NoBatchDeleteMixin, VersionAdmin):
             # on the model.
             form.base_fields['problem_label_script'].widget = AceWidget('lua', request.profile.ace_theme)
 
-        perms = ('edit_own_contest', 'edit_all_contest')
+        perms = ('change_contest', 'edit_all_contest')
         form.base_fields['organizers'].queryset = Profile.objects.filter(
             Q(user__is_superuser=True) |
             Q(user__groups__permissions__codename__in=perms) |

@@ -16,7 +16,7 @@
 {% endblock extrahead %}
 
 {% block after_field_sets %}{{ block.super }}
-    {% if original and original.freeze_submissions and perms.judge.contest_frozen_state %}
+    {% if original and original.freeze_submissions %}
         <a style="display: none" title="{% trans "Unfreeze" %}" href="{% url 'admin:judge_contest_unfreeze' original.pk %}"
            class="button unfreeze-link">
             <i class="fa fa-lg fa-unlock"></i>

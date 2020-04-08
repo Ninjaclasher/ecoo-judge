@@ -6,7 +6,7 @@ from operator import attrgetter, itemgetter
 
 from django import forms
 from django.conf import settings
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 from django.db.models import Case, Count, FloatField, IntegerField, Max, Sum, Value, When
@@ -214,11 +214,16 @@ class ContestDetail(ContestMixin, TitleMixin, DetailView):
         return context
 
 
-class ContestClone(ContestMixin, PermissionRequiredMixin, TitleMixin, SingleObjectFormView):
+class ContestClone(ContestMixin, TitleMixin, SingleObjectFormView):
     title = _('Clone Contest')
     template_name = 'contest/clone.html'
     form_class = ContestCloneForm
-    permission_required = 'judge.clone_contest'
+
+    def get_object(self, queryset=None):
+        contest = super().get_object(queryset)
+        if not contest.is_editable_by(self.request.user):
+            raise Http404()
+        return contest
 
     def form_valid(self, form):
         contest = self.object
@@ -619,9 +624,7 @@ class ContestParticipationDisqualify(ContestMixin, SingleObjectMixin, View):
         return HttpResponseRedirect(reverse('contest_ranking', args=(self.object.key,)))
 
 
-class ContestMossMixin(ContestMixin, PermissionRequiredMixin):
-    permission_required = 'judge.moss_contest'
-
+class ContestMossMixin(ContestMixin):
     def get_object(self, queryset=None):
         contest = super().get_object(queryset)
         if settings.MOSS_API_KEY is None or not contest.is_editable_by(self.request.user):

@@ -6,7 +6,7 @@
         {{ make_tab('stats', 'fa-pie-chart', url('contest_stats', contest.key), _('Statistics')) }}
     {% endif %}
 
-    {% if contest.start_time <= now or perms.judge.see_private_contest %}
+    {% if contest.start_time <= now or can_edit %}
         {% if contest.can_see_scoreboard(request.user) %}
             {{ make_tab('ranking', 'fa-bar-chart', url('contest_ranking', contest.key), _('Rankings')) }}
             {{ make_tab('participation', 'fa-users', url('contest_participation_own', contest.key), _('Participation')) }}
@@ -15,12 +15,8 @@
         {% endif %}
     {% endif %}
     {% if can_edit %}
-        {% if perms.judge.moss_contest and has_moss_api_key %}
-            {{ make_tab('moss', 'fa-gavel', url('contest_moss', contest.key), _('MOSS')) }}
-        {% endif %}
+        {{ make_tab('moss', 'fa-gavel', url('contest_moss', contest.key), _('MOSS')) }}
         {{ make_tab('edit', 'fa-edit', url('admin:judge_contest_change', contest.id), _('Edit')) }}
-    {% endif %}
-    {% if perms.judge.clone_contest %}
         {{ make_tab('clone', 'fa-copy', url('contest_clone', contest.key), _('Clone')) }}
     {% endif %}
 

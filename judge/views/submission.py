@@ -231,7 +231,7 @@ class SubmissionsListBase(DiggPaginatorMixin, TitleMixin, ListView):
         else:
             queryset = queryset.select_related('contest_object').defer('contest_object__description')
 
-            if not self.request.user.has_perm('judge.see_private_contest'):
+            if not self.request.user.has_perm('judge.edit_all_contest'):
                 # Show submissions for any contest you can edit, finished, or visible scoreboard
                 contest_queryset = Contest.objects.exclude(Q(organizers=self.request.profile) |
                                                            Q(end_time__lte=timezone.now(),
@@ -511,7 +511,7 @@ class ForceContestMixin(object):
     def access_check(self, request):
         # super(ForceContestMixin, self).access_check(request)
 
-        if not request.user.has_perm('judge.see_private_contest'):
+        if not request.user.has_perm('judge.edit_all_contest'):
             if not self.contest.is_visible:
                 raise Http404()
             if self.contest.start_time is not None and self.contest.start_time > timezone.now():

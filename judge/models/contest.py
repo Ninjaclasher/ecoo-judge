@@ -244,8 +244,7 @@ class Contest(models.Model):
             return False
         if self.ended:
             return self.is_virtualable
-        if user.has_perm('judge.join_all_contest'):
-            return True
+
         if user.has_perm('judge.edit_own_contest') and \
                 self.organizers.filter(id=user.profile.id).exists():
             return True
@@ -267,10 +266,6 @@ class Contest(models.Model):
         pass
 
     def access_check(self, user):
-        # If the user can view all contests
-        if user.has_perm('judge.see_private_contest'):
-            return
-
         # User can edit the contest
         if self.is_editable_by(user):
             return
@@ -322,7 +317,7 @@ class Contest(models.Model):
             return True
 
         # If the user is a contest organizer
-        if user.has_perm('judge.edit_own_contest') and \
+        if user.has_perm('judge.change_contest') and \
                 self.organizers.filter(id=user.profile.id).exists():
             return True
 
@@ -333,12 +328,11 @@ class Contest(models.Model):
         profile = user.profile if user.is_authenticated else None
         queryset = cls.objects.defer('description')
 
-        if not user.has_perm('judge.see_private_contest'):
+        if not user.has_perm('judge.edit_all_contest'):
             filter = Q(is_visible=True)
             if user.is_authenticated:
                 filter |= Q(organizers=profile)
             queryset = queryset.filter(filter)
-        if not user.has_perm('judge.edit_all_contest'):
             filter = Q(is_private=False, is_organization_private=False)
             if user.is_authenticated:
                 filter |= Q(organizers=profile)
@@ -360,17 +354,7 @@ class Contest(models.Model):
 
     class Meta:
         permissions = (
-            ('see_private_contest', _('See private contests')),
-            ('join_all_contest', _('Join all contests')),
-            ('edit_own_contest', _('Edit own contests')),
             ('edit_all_contest', _('Edit all contests')),
-            ('clone_contest', _('Clone contest')),
-            ('contest_frozen_state', _('Change contest frozen state')),
-            ('moss_contest', _('MOSS contest')),
-            ('contest_access_code', _('Contest access codes')),
-            ('create_private_contest', _('Create private contests')),
-            ('change_contest_visibility', _('Change contest visibility')),
-            ('contest_problem_label', _('Edit contest problem label script')),
         )
         verbose_name = _('contest')
         verbose_name_plural = _('contests')
