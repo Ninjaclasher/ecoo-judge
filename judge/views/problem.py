@@ -31,7 +31,6 @@ from judge.utils.diggpaginator import DiggPaginator
 from judge.utils.opengraph import generate_opengraph
 from judge.utils.problems import contest_attempted_ids, contest_completed_ids, user_attempted_ids, \
     user_completed_ids
-from judge.utils.strings import safe_float_or_none
 from judge.utils.tickets import own_ticket_filter
 from judge.utils.views import QueryStringSortMixin, SingleObjectFormView, TitleMixin, generic_message
 
@@ -355,11 +354,6 @@ class ProblemList(QueryStringSortMixin, TitleMixin, SolvedProblemMixin, ListView
                 queryset = queryset.filter(
                     Q(code__icontains=query) | Q(name__icontains=query) |
                     Q(translations__name__icontains=query, translations__language=self.request.LANGUAGE_CODE))
-        self.prepoint_queryset = queryset
-        if self.point_start is not None:
-            queryset = queryset.filter(points__gte=self.point_start)
-        if self.point_end is not None:
-            queryset = queryset.filter(points__lte=self.point_end)
         return queryset.distinct()
 
     def get_queryset(self):
@@ -377,30 +371,9 @@ class ProblemList(QueryStringSortMixin, TitleMixin, SolvedProblemMixin, ListView
         context.update(self.get_sort_paginate_context())
         if not self.in_contest:
             context.update(self.get_sort_context())
-            context['point_start'], context['point_end'], context['point_values'] = self.get_noui_slider_points()
         else:
-            context['point_start'], context['point_end'], context['point_values'] = 0, 0, {}
             context['hide_contest_scoreboard'] = self.contest.hide_scoreboard
         return context
-
-    def get_noui_slider_points(self):
-        points = sorted(self.prepoint_queryset.values_list('points', flat=True).distinct())
-        if not points:
-            return 0, 0, {}
-        if len(points) == 1:
-            return points[0], points[0], {
-                'min': points[0] - 1,
-                'max': points[0] + 1,
-            }
-
-        start, end = points[0], points[-1]
-        if self.point_start is not None:
-            start = self.point_start
-        if self.point_end is not None:
-            end = self.point_end
-        points_map = {0.0: 'min', 1.0: 'max'}
-        size = len(points) - 1
-        return start, end, {points_map.get(i / size, '%.2f%%' % (100 * i / size,)): j for i, j in enumerate(points)}
 
     def GET_with_session(self, request, key):
         if not request.GET:
@@ -412,9 +385,6 @@ class ProblemList(QueryStringSortMixin, TitleMixin, SolvedProblemMixin, ListView
 
         # This actually copies into the instance dictionary...
         self.all_sorts = set(self.all_sorts)
-
-        self.point_start = safe_float_or_none(request.GET.get('point_start'))
-        self.point_end = safe_float_or_none(request.GET.get('point_end'))
 
     def get(self, request, *args, **kwargs):
         self.setup_problem_list(request)
