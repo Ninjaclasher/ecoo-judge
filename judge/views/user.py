@@ -18,7 +18,6 @@ from reversion import revisions
 from judge.forms import ProfileForm, newsletter_id
 from judge.models import Profile, Submission, Ticket
 from judge.utils.problems import contest_completed_ids, user_completed_ids
-from judge.utils.ranker import ranker
 from judge.utils.subscription import Subscription
 from judge.utils.views import DiggPaginatorMixin, TitleMixin, generic_message
 from .contests import ContestRanking
@@ -165,7 +164,7 @@ class UserList(DiggPaginatorMixin, TitleMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super(UserList, self).get_context_data(**kwargs)
-        context['users'] = ranker(context['users'], rank=self.paginate_by * (context['page_obj'].number - 1))
+        context['users'] = list(enumerate(context['users'], self.paginate_by * (context['page_obj'].number - 1) + 1))
         context['first_page_href'] = '.'
         return context
 
