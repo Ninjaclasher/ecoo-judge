@@ -1,7 +1,5 @@
 import json
-from calendar import Calendar, SUNDAY
 from collections import defaultdict, namedtuple
-from datetime import date, datetime, time, timedelta
 from functools import partial
 from itertools import chain
 from operator import attrgetter, itemgetter
@@ -9,22 +7,19 @@ from operator import attrgetter, itemgetter
 from django import forms
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from django.core.cache import cache
-from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
-from django.db.models import Case, Count, FloatField, IntegerField, Max, Min, Q, Sum, Value, When
+from django.db.models import Case, Count, FloatField, IntegerField, Max, Sum, Value, When
 from django.db.models.expressions import CombinedExpression
-from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseRedirect
+from django.http import Http404, HttpResponseBadRequest, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
-from django.template.defaultfilters import date as date_filter
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
-from django.utils.timezone import make_aware
 from django.utils.translation import gettext as _, gettext_lazy
-from django.views.generic import ListView, TemplateView
+from django.views.generic import ListView
 from django.views.generic.detail import BaseDetailView, DetailView, SingleObjectMixin, View
 
 from judge import event_poster as event
@@ -40,7 +35,7 @@ from judge.utils.stats import get_bar_chart, get_pie_chart
 from judge.utils.views import DiggPaginatorMixin, SingleObjectFormView, TitleMixin, generic_message, \
     paginate_query_context
 
-__all__ = ['ContestList', 'ContestDetail', 'ContestRanking', 'ContestJoin', 'ContestLeave', 'ContestCalendar',
+__all__ = ['ContestList', 'ContestDetail', 'ContestRanking', 'ContestJoin', 'ContestLeave',
            'ContestClone', 'ContestStats', 'ContestMossView', 'ContestMossDelete', 'contest_ranking_ajax',
            'ContestParticipationList', 'ContestParticipationDisqualify', 'get_contest_ranking_list',
            'base_contest_ranking_list']
@@ -377,102 +372,6 @@ class ContestLeave(LoginRequiredMixin, ContestMixin, BaseDetailView):
 
         profile.remove_contest()
         return HttpResponseRedirect(reverse('contest_view', args=(contest.key,)))
-
-
-ContestDay = namedtuple('ContestDay', 'date weekday is_pad is_today starts ends oneday')
-
-
-class ContestCalendar(TitleMixin, ContestListMixin, TemplateView):
-    firstweekday = SUNDAY
-    weekday_classes = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']
-    template_name = 'contest/calendar.html'
-
-    def get(self, request, *args, **kwargs):
-        try:
-            self.year = int(kwargs['year'])
-            self.month = int(kwargs['month'])
-        except (KeyError, ValueError):
-            raise ImproperlyConfigured(_('ContestCalendar requires integer year and month'))
-        self.today = timezone.now().date()
-        return self.render()
-
-    def render(self):
-        context = self.get_context_data()
-        return self.render_to_response(context)
-
-    def get_contest_data(self, start, end):
-        end += timedelta(days=1)
-        contests = self.get_queryset().filter(Q(start_time__gte=start, start_time__lt=end) |
-                                              Q(end_time__gte=start, end_time__lt=end))
-        starts, ends, oneday = (defaultdict(list) for i in range(3))
-        for contest in contests:
-            start_date = timezone.localtime(contest.start_time).date()
-            end_date = timezone.localtime(contest.end_time - timedelta(seconds=1)).date()
-            if start_date == end_date:
-                oneday[start_date].append(contest)
-            else:
-                starts[start_date].append(contest)
-                ends[end_date].append(contest)
-        return starts, ends, oneday
-
-    def get_table(self):
-        calendar = Calendar(self.firstweekday).monthdatescalendar(self.year, self.month)
-        starts, ends, oneday = self.get_contest_data(make_aware(datetime.combine(calendar[0][0], time.min)),
-                                                     make_aware(datetime.combine(calendar[-1][-1], time.min)))
-        return [[ContestDay(
-            date=date, weekday=self.weekday_classes[weekday], is_pad=date.month != self.month,
-            is_today=date == self.today, starts=starts[date], ends=ends[date], oneday=oneday[date],
-        ) for weekday, date in enumerate(week)] for week in calendar]
-
-    def get_context_data(self, **kwargs):
-        context = super(ContestCalendar, self).get_context_data(**kwargs)
-
-        try:
-            month = date(self.year, self.month, 1)
-        except ValueError:
-            raise Http404()
-        else:
-            context['title'] = _('Contests in %(month)s') % {'month': date_filter(month, _("F Y"))}
-
-        dates = Contest.get_visible_contests(self.request.user).aggregate(min=Min('start_time'), max=Max('end_time'))
-        min_month = (self.today.year, self.today.month)
-        if dates['min'] is not None:
-            min_month = dates['min'].year, dates['min'].month
-        max_month = (self.today.year, self.today.month)
-        if dates['max'] is not None:
-            max_month = max((dates['max'].year, dates['max'].month), (self.today.year, self.today.month))
-
-        month = (self.year, self.month)
-        if month < min_month or month > max_month:
-            # 404 is valid because it merely declares the lack of existence, without any reason
-            raise Http404()
-
-        context['now'] = timezone.now()
-        context['calendar'] = self.get_table()
-        context['curr_month'] = date(self.year, self.month, 1)
-
-        if month > min_month:
-            context['prev_month'] = date(self.year - (self.month == 1), 12 if self.month == 1 else self.month - 1, 1)
-        else:
-            context['prev_month'] = None
-
-        if month < max_month:
-            context['next_month'] = date(self.year + (self.month == 12), 1 if self.month == 12 else self.month + 1, 1)
-        else:
-            context['next_month'] = None
-        return context
-
-
-class CachedContestCalendar(ContestCalendar):
-    def render(self):
-        key = 'contest_cal:%d:%d' % (self.year, self.month)
-        cached = cache.get(key)
-        if cached is not None:
-            return HttpResponse(cached)
-        response = super(CachedContestCalendar, self).render()
-        response.render()
-        cached.set(key, response.content)
-        return response
 
 
 class ContestStats(TitleMixin, ContestMixin, DetailView):
