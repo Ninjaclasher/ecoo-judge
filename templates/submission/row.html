@@ -65,19 +65,21 @@
     </div></div>
 {% endif %}
 
-<div class="sub-usage">
-    {% if submission.status in ('QU', 'P', 'G', 'CE', 'IE', 'AB') %}
-        <div class="time">---</div>
-        <div class="memory">---</div>
-    {% else %}
-        {% if "TLE" != submission.result %}
-            <div title="{{ submission.time or 0 }}s" class="time">
-                {{ (submission.time or 0)|floatformat(2) }}s
-            </div>
-        {% else %}
+{% if request.user.is_staff %}
+    <div class="sub-usage">
+        {% if submission.status in ('QU', 'P', 'G', 'CE', 'IE', 'AB') %}
             <div class="time">---</div>
+            <div class="memory">---</div>
+        {% else %}
+            {% if "TLE" != submission.result %}
+                <div title="{{ submission.time or 0 }}s" class="time">
+                    {{ (submission.time or 0)|floatformat(2) }}s
+                </div>
+            {% else %}
+                <div class="time">---</div>
+            {% endif %}
+            {# No one actually like IEC prefixes, Jinja2. #}
+            <div class="memory">{{ (submission.memory_bytes|filesizeformat(True)).replace('i', '') }}</div>
         {% endif %}
-        {# No one actually like IEC prefixes, Jinja2. #}
-        <div class="memory">{{ (submission.memory_bytes|filesizeformat(True)).replace('i', '') }}</div>
-    {% endif %}
-</div>
+    </div>
+{% endif %}
