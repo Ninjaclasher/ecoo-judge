@@ -103,7 +103,7 @@ class OrganizationUsers(OrganizationDetailView):
         context = super(OrganizationUsers, self).get_context_data(**kwargs)
         context['title'] = _('%s Members') % self.object.name
         context['users'] = \
-            ranker(self.object.members.filter(is_unlisted=False).order_by('-performance_points', '-problem_count')
+            ranker(self.object.members.filter(is_unlisted=False).order_by('-problem_count')
                    .select_related('user').defer('notes'))
         context['partial'] = True
         context['is_admin'] = self.can_edit_organization()

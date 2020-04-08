@@ -85,10 +85,6 @@ class UserPage(TitleMixin, UserMixin, DetailView):
         context['hide_solved'] = int(self.hide_solved)
         context['authored'] = self.object.authored_problems.filter(is_public=True, is_organization_private=False) \
                                   .order_by('code')
-        context['rank'] = Profile.objects.filter(
-            is_unlisted=False, performance_points__gt=self.object.performance_points,
-        ).count() + 1
-
         return context
 
     def get(self, request, *args, **kwargs):
@@ -173,15 +169,14 @@ class UserList(QueryStringSortMixin, DiggPaginatorMixin, TitleMixin, ListView):
     context_object_name = 'users'
     template_name = 'user/list.html'
     paginate_by = 100
-    all_sorts = frozenset(('points', 'problem_count', 'performance_points'))
+    all_sorts = frozenset(('problem_count',))
     default_desc = all_sorts
-    default_sort = '-performance_points'
+    default_sort = '-problem_count'
 
     def get_queryset(self):
         return (Profile.objects.filter(is_unlisted=False)
                 .order_by(self.order, 'id').select_related('user')
-                .only('display_rank', 'user__username', 'points', 'performance_points',
-                      'problem_count'))
+                .only('display_rank', 'user__username', 'problem_count'))
 
     def get_context_data(self, **kwargs):
         context = super(UserList, self).get_context_data(**kwargs)
@@ -218,10 +213,10 @@ def user_ranking_redirect(request):
         raise Http404()
     user = get_object_or_404(Profile, user__username=username)
     rank = Profile.objects.filter(
-        is_unlisted=False, performance_points__gt=user.performance_points,
+        is_unlisted=False, problem_count__gt=user.problem_count,
     ).count()
     rank += Profile.objects.filter(
-        is_unlisted=False, performance_points__exact=user.performance_points, id__lt=user.id,
+        is_unlisted=False, problem_count__exact=user.problem_count, id__lt=user.id,
     ).count()
     page = rank // UserList.paginate_by
     return HttpResponseRedirect('%s%s#!%s' % (reverse('user_list'), '?page=%d' % (page + 1) if page else '', username))

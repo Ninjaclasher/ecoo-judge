@@ -8,20 +8,12 @@ from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
-from fernet_fields import EncryptedCharField
 from sortedm2m.fields import SortedManyToManyField
 
 from judge.models.choices import ACE_THEMES, MATH_ENGINES_CHOICES, TIMEZONE
 from judge.models.runtime import Language
 
 __all__ = ['Organization', 'Profile', 'OrganizationRequest']
-
-
-class EncryptedNullCharField(EncryptedCharField):
-    def get_prep_value(self, value):
-        if not value:
-            return None
-        return super(EncryptedNullCharField, self).get_prep_value(value)
 
 
 class Organization(models.Model):
@@ -82,7 +74,6 @@ class Profile(models.Model):
     language = models.ForeignKey('Language', verbose_name=_('preferred language'), on_delete=models.SET_DEFAULT,
                                  default=Language.get_default_language_pk)
     points = models.FloatField(default=0, db_index=True)
-    performance_points = models.FloatField(default=0, db_index=True)
     problem_count = models.IntegerField(default=0, db_index=True)
     ace_theme = models.CharField(max_length=30, choices=ACE_THEMES, default='github')
     last_access = models.DateTimeField(verbose_name=_('last access time'), default=now)
@@ -114,29 +105,19 @@ class Profile(models.Model):
     def username(self):
         return self.user.username
 
-    _pp_table = [pow(settings.DMOJ_PP_STEP, i) for i in range(settings.DMOJ_PP_ENTRIES)]
-
-    def calculate_points(self, table=_pp_table):
-        from judge.models import Problem
+    def calculate_points(self):
         public_problems = Problem.get_public_problems()
         data = (
             public_problems.filter(submission__user=self, submission__points__isnull=False)
                            .annotate(max_points=Max('submission__points')).order_by('-max_points')
                            .values_list('max_points', flat=True).filter(max_points__gt=0)
         )
-        extradata = (
-            public_problems.filter(submission__user=self, submission__result='AC').values('id').count()
-        )
-        bonus_function = settings.DMOJ_PP_BONUS_FUNCTION
         points = sum(data)
         problems = len(data)
-        entries = min(len(data), len(table))
-        pp = sum(map(mul, table[:entries], data[:entries])) + bonus_function(extradata)
-        if self.points != points or problems != self.problem_count or self.performance_points != pp:
+        if self.points != points or problems != self.problem_count:
             self.points = points
             self.problem_count = problems
-            self.performance_points = pp
-            self.save(update_fields=['points', 'problem_count', 'performance_points'])
+            self.save(update_fields=['points', 'problem_count'])
         return points
 
     calculate_points.alters_data = True
