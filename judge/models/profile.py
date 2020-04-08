@@ -73,7 +73,6 @@ class Profile(models.Model):
                                 default=settings.DEFAULT_USER_TIME_ZONE)
     language = models.ForeignKey('Language', verbose_name=_('preferred language'), on_delete=models.SET_DEFAULT,
                                  default=Language.get_default_language_pk)
-    points = models.FloatField(default=0, db_index=True)
     problem_count = models.IntegerField(default=0, db_index=True)
     ace_theme = models.CharField(max_length=30, choices=ACE_THEMES, default='github')
     last_access = models.DateTimeField(verbose_name=_('last access time'), default=now)
@@ -106,21 +105,15 @@ class Profile(models.Model):
         return self.user.username
 
     def calculate_points(self):
-        public_problems = Problem.get_public_problems()
-        data = (
-            public_problems.filter(submission__user=self, submission__points__isnull=False)
-                           .annotate(max_points=Max('submission__points')).order_by('-max_points')
-                           .values_list('max_points', flat=True).filter(max_points__gt=0)
+        problems = (
+            Problem.get_public_problems().filter(submission__user=self, submission__points__isnull=False)
+                   .annotate(max_points=Max('submission__points')).order_by('-max_points')
+                   .values_list('max_points', flat=True).filter(max_points__gt=0).count()
         )
-        points = sum(data)
-        problems = len(data)
-        if self.points != points or problems != self.problem_count:
-            self.points = points
+        if problems != self.problem_count:
             self.problem_count = problems
-            self.save(update_fields=['points', 'problem_count'])
+            self.save(update_fields=['problem_count'])
         return points
-
-    calculate_points.alters_data = True
 
     def remove_contest(self):
         self.current_contest = None
