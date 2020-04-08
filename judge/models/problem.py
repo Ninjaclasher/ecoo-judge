@@ -6,11 +6,11 @@ from django.db import models
 from django.db.models import CASCADE, F, Q, QuerySet, SET_NULL
 from django.db.models.expressions import RawSQL
 from django.db.models.functions import Coalesce
+from django.db.models.query import QuerySet
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
-from judge.fulltext import SearchQuerySet
 from judge.models.profile import Organization, Profile
 from judge.models.runtime import Language
 from judge.utils.raw_sql import RawSQLColumn, unique_together_left_join
@@ -40,10 +40,7 @@ class License(models.Model):
         verbose_name_plural = _('licenses')
 
 
-class TranslatedProblemQuerySet(SearchQuerySet):
-    def __init__(self, **kwargs):
-        super(TranslatedProblemQuerySet, self).__init__(('code', 'name', 'description'), **kwargs)
-
+class TranslatedProblemQuerySet(QuerySet):
     def add_i18n_name(self, language):
         queryset = self._clone()
         alias = unique_together_left_join(queryset, ProblemTranslation, 'problem', 'language', language)
