@@ -1,8 +1,8 @@
 from django.conf.urls import url
 from django.contrib import admin
 from django.db import transaction
-from django.db.models import Q, TextField
-from django.forms import ModelForm, ModelMultipleChoiceField
+from django.db.models import Q
+from django.forms import ModelForm
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
@@ -14,7 +14,7 @@ from django_ace import AceWidget
 from judge.models import Contest, ContestProblem, ContestSubmission, Profile
 from judge.utils.views import NoBatchDeleteMixin
 from judge.widgets import AdminHeavySelect2MultipleWidget, AdminHeavySelect2Widget, AdminMartorWidget, \
-    AdminSelect2MultipleWidget, AdminSelect2Widget
+    AdminSelect2Widget
 
 
 class AdminHeavySelect2Widget(AdminHeavySelect2Widget):

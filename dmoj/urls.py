@@ -75,7 +75,6 @@ register_patterns = [
     url(r'^password/reset/done/$', auth_views.PasswordResetDoneView.as_view(
         template_name='registration/password_reset_done.html',
     ), name='password_reset_done'),
-    url(r'^social/error/$', register.social_auth_error, name='social_auth_error'),
 ]
 
 
@@ -98,7 +97,6 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^i18n/', include('django.conf.urls.i18n')),
     url(r'^accounts/', include(register_patterns)),
-    url(r'^', include('social_django.urls')),
 
     url(r'^problems/$', problem.ProblemList.as_view(), name='problem_list'),
 
