@@ -9,7 +9,7 @@ from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 
 from .caching import finished_submission
-from .models import BlogPost, Contest, ContestSubmission, EFFECTIVE_MATH_ENGINES, Judge, Language, License, \
+from .models import BlogPost, Contest, ContestSubmission, EFFECTIVE_MATH_ENGINES, Judge, Language, \
     MiscConfig, Organization, Problem, Profile, Submission
 
 
@@ -61,11 +61,6 @@ def contest_update(sender, instance, **kwargs):
     cache.delete_many(['generated-meta-contest:%d' % instance.id] +
                       [make_template_fragment_key('contest_html', (instance.id, engine))
                        for engine in EFFECTIVE_MATH_ENGINES])
-
-
-@receiver(post_save, sender=License)
-def license_update(sender, instance, **kwargs):
-    cache.delete(make_template_fragment_key('license_html', (instance.id,)))
 
 
 @receiver(post_save, sender=Language)

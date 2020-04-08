@@ -46,10 +46,6 @@ class SolutionMarkdownPreviewView(MarkdownPreviewView):
     template_name = 'solution-preview.html'
 
 
-class LicenseMarkdownPreviewView(MarkdownPreviewView):
-    template_name = 'license-preview.html'
-
-
 class TicketMarkdownPreviewView(MarkdownPreviewView):
     template_name = 'ticket/preview.html'
 

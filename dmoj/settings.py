@@ -185,7 +185,6 @@ else:
                     'icon': 'fa-bars',
                     'children': [
                         'judge.MiscConfig',
-                        'judge.License',
                         'sites.Site',
                         'redirects.Redirect',
                     ],
@@ -379,7 +378,6 @@ MARKDOWN_STYLES = {
     'contest': MARKDOWN_ADMIN_EDITABLE_STYLE,
     'flatpage': MARKDOWN_ADMIN_EDITABLE_STYLE,
     'language': MARKDOWN_ADMIN_EDITABLE_STYLE,
-    'license': MARKDOWN_ADMIN_EDITABLE_STYLE,
     'judge': MARKDOWN_ADMIN_EDITABLE_STYLE,
     'blog': MARKDOWN_ADMIN_EDITABLE_STYLE,
     'solution': MARKDOWN_ADMIN_EDITABLE_STYLE,

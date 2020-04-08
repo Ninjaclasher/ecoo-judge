@@ -11,7 +11,7 @@ from django.views.generic import RedirectView
 from martor.views import markdown_search_user
 
 from judge.forms import CustomAuthenticationForm
-from judge.views import TitledTemplateView, blog, contests, language, license, mailgun, organization, \
+from judge.views import TitledTemplateView, blog, contests, language, mailgun, organization, \
     preview, problem, problem_manage, ranked_submission, register, status, submission, tasks, ticket, \
     user, widgets
 from judge.views.problem_data import ProblemDataView, ProblemSubmissionDiff, \
@@ -213,8 +213,6 @@ urlpatterns = [
     url(r'^blog/', paged_list_view(blog.PostList, 'blog_post_list')),
     url(r'^post/(?P<id>\d+)-(?P<slug>.*)$', blog.PostView.as_view(), name='blog_post'),
 
-    url(r'^license/(?P<key>[-\w.]+)$', license.LicenseDetail.as_view(), name='license'),
-
     url(r'^mailgun/mail_activate/$', mailgun.MailgunActivationView.as_view(), name='mailgun_activate'),
 
     url(r'^widgets/', include([
@@ -244,7 +242,6 @@ urlpatterns = [
             url(r'^profile$', preview.ProfileMarkdownPreviewView.as_view(), name='profile_preview'),
             url(r'^organization$', preview.OrganizationMarkdownPreviewView.as_view(), name='organization_preview'),
             url(r'^solution$', preview.SolutionMarkdownPreviewView.as_view(), name='solution_preview'),
-            url(r'^license$', preview.LicenseMarkdownPreviewView.as_view(), name='license_preview'),
             url(r'^ticket$', preview.TicketMarkdownPreviewView.as_view(), name='ticket_preview'),
         ])),
 

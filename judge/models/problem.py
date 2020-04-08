@@ -15,28 +15,7 @@ from judge.models.runtime import Language
 from judge.utils.raw_sql import RawSQLColumn, unique_together_left_join
 
 __all__ = ['Problem', 'ProblemTranslation', 'ProblemClarification',
-           'License', 'Solution', 'TranslatedProblemQuerySet', 'TranslatedProblemForeignKeyQuerySet']
-
-
-class License(models.Model):
-    key = models.CharField(max_length=20, unique=True, verbose_name=_('key'),
-                           validators=[RegexValidator(r'^[-\w.]+$', r'License key must be ^[-\w.]+$')])
-    link = models.CharField(max_length=256, verbose_name=_('link'))
-    name = models.CharField(max_length=256, verbose_name=_('full name'))
-    display = models.CharField(max_length=256, blank=True, verbose_name=_('short name'),
-                               help_text=_('Displayed on pages under this license'))
-    icon = models.CharField(max_length=256, blank=True, verbose_name=_('icon'), help_text=_('URL to the icon'))
-    text = models.TextField(verbose_name=_('license text'))
-
-    def __str__(self):
-        return self.name
-
-    def get_absolute_url(self):
-        return reverse('license', args=(self.key,))
-
-    class Meta:
-        verbose_name = _('license')
-        verbose_name_plural = _('licenses')
+           'Solution', 'TranslatedProblemQuerySet', 'TranslatedProblemForeignKeyQuerySet']
 
 
 class TranslatedProblemQuerySet(QuerySet):
@@ -102,8 +81,6 @@ class Problem(models.Model):
                                 help_text=_("Doesn't have magic ability to auto-publish due to backward compatibility"))
     banned_users = models.ManyToManyField(Profile, verbose_name=_('personae non gratae'), blank=True,
                                           help_text=_('Bans the selected users from submitting to this problem.'))
-    license = models.ForeignKey(License, null=True, blank=True, on_delete=SET_NULL,
-                                help_text=_('The license under which this problem is published.'))
     og_image = models.CharField(verbose_name=_('OpenGraph image'), max_length=150, blank=True)
     summary = models.TextField(blank=True, verbose_name=_('problem summary'),
                                help_text=_('Plain-text, shown in meta description tag, e.g. for social media.'))
