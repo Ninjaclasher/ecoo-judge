@@ -34,12 +34,6 @@ class OrganizationAdmin(VersionAdmin):
 
     show_public.short_description = ''
 
-    def get_readonly_fields(self, request, obj=None):
-        fields = self.readonly_fields
-        if not request.user.has_perm('judge.organization_admin'):
-            return fields + ('registrant', 'admins', 'is_open', 'slots')
-        return fields
-
     def get_queryset(self, request):
         queryset = Organization.objects.all()
         if request.user.has_perm('judge.edit_all_organization'):

@@ -375,8 +375,5 @@ class Solution(models.Model):
         return _('Editorial for %s') % self.problem.name
 
     class Meta:
-        permissions = (
-            ('see_private_solution', 'See hidden solutions'),
-        )
         verbose_name = _('solution')
         verbose_name_plural = _('solutions')

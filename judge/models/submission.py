@@ -176,9 +176,6 @@ class Submission(models.Model):
         if problem.is_editable_by(user):
             return True
 
-        if user.has_perm('judge.view_all_submission'):
-            return True
-
         if problem.is_public or problem.testers.filter(id=profile.id).exists():
             if problem.submission_set.filter(user_id=profile.id, result='AC',
                                              points=problem.points).exists():
@@ -223,7 +220,6 @@ class Submission(models.Model):
             ('rejudge_submission', 'Rejudge the submission'),
             ('rejudge_submission_lot', 'Rejudge a lot of submissions'),
             ('spam_submission', 'Submit without limit'),
-            ('view_all_submission', 'View all submission'),
             ('resubmit_other', "Resubmit others' submission"),
         )
         verbose_name = _('submission')

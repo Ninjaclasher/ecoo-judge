@@ -57,7 +57,6 @@ class Organization(models.Model):
     class Meta:
         ordering = ['name']
         permissions = (
-            ('organization_admin', 'Administer organizations'),
             ('edit_all_organization', 'Edit all organizations'),
         )
         verbose_name = _('organization')
