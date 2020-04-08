@@ -2,7 +2,7 @@ from reversion import revisions
 
 from judge.models.choices import ACE_THEMES, EFFECTIVE_MATH_ENGINES, MATH_ENGINES_CHOICES, TIMEZONE
 from judge.models.contest import Contest, ContestMoss, ContestParticipation, ContestProblem, \
-    ContestSubmission, ContestTag
+    ContestSubmission
 from judge.models.interface import BlogPost, MiscConfig, NavigationBar, validate_regex
 from judge.models.message import PrivateMessage, PrivateMessageThread
 from judge.models.problem import LanguageLimit, Problem, ProblemClarification, \
