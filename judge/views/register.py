@@ -97,10 +97,3 @@ class ActivationView(OldActivationView):
         if 'title' not in kwargs:
             kwargs['title'] = self.title
         return super(ActivationView, self).get_context_data(**kwargs)
-
-
-def social_auth_error(request):
-    return render(request, 'generic-message.html', {
-        'title': gettext('Authentication failure'),
-        'message': request.GET.get('message'),
-    })
