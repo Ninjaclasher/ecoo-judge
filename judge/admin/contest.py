@@ -104,7 +104,7 @@ class ContestForm(ModelForm):
 class ContestAdmin(NoBatchDeleteMixin, VersionAdmin):
     fieldsets = (
         (None, {'fields': ('key', 'name', 'organizers')}),
-        (_('Settings'), {'fields': ('is_visible', 'is_external', 'is_virtualable', 'use_clarifications',
+        (_('Settings'), {'fields': ('is_visible', 'is_virtualable', 'use_clarifications',
                                     'freeze_submissions', 'hide_scoreboard',
                                     'permanently_hide_scoreboard', 'run_pretests_only', 'access_code')}),
         (_('Scheduling'), {'fields': ('start_time', 'end_time', 'time_limit')}),

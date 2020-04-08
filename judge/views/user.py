@@ -90,7 +90,7 @@ class UserPage(TitleMixin, UserMixin, DetailView):
         context['authored'] = self.object.authored_problems.filter(is_public=True, is_organization_private=False) \
                                   .order_by('code')
         context['rank'] = Profile.objects.filter(
-            is_external_user=False, is_unlisted=False, performance_points__gt=self.object.performance_points,
+            is_unlisted=False, performance_points__gt=self.object.performance_points,
         ).count() + 1
 
         return context
@@ -239,7 +239,7 @@ class UserList(QueryStringSortMixin, DiggPaginatorMixin, TitleMixin, ListView):
     default_sort = '-performance_points'
 
     def get_queryset(self):
-        return (Profile.objects.filter(is_external_user=False, is_unlisted=False)
+        return (Profile.objects.filter(is_unlisted=False)
                 .order_by(self.order, 'id').select_related('user')
                 .only('display_rank', 'user__username', 'points', 'performance_points',
                       'problem_count'))
@@ -279,10 +279,10 @@ def user_ranking_redirect(request):
         raise Http404()
     user = get_object_or_404(Profile, user__username=username)
     rank = Profile.objects.filter(
-        is_external_user=False, is_unlisted=False, performance_points__gt=user.performance_points,
+        is_unlisted=False, performance_points__gt=user.performance_points,
     ).count()
     rank += Profile.objects.filter(
-        is_external_user=False, is_unlisted=False, performance_points__exact=user.performance_points, id__lt=user.id,
+        is_unlisted=False, performance_points__exact=user.performance_points, id__lt=user.id,
     ).count()
     page = rank // UserList.paginate_by
     return HttpResponseRedirect('%s%s#!%s' % (reverse('user_list'), '?page=%d' % (page + 1) if page else '', username))

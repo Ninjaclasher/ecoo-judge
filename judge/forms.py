@@ -57,11 +57,6 @@ class ProfileForm(ModelForm):
                 Q(is_open=True) | Q(id__in=user.profile.organizations.all()),
             )
 
-    def clean_organizations(self):
-        if self.instance.is_external_user:
-            return self.instance.organizations.all()
-        return self.cleaned_data['organizations']
-
 
 class ProblemSubmitForm(ModelForm):
     source = CharField(max_length=65536, widget=AceWidget(theme='twilight', no_ace_media=True))

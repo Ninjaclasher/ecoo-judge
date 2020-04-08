@@ -103,9 +103,6 @@ class Profile(models.Model):
                                    help_text=_('the rendering engine used to render math'))
     notes = models.TextField(verbose_name=_('internal notes'), null=True, blank=True,
                              help_text=_('Notes for administrators regarding this user.'))
-    is_external_user = models.BooleanField(verbose_name=_('external user'), default=False,
-                                           help_text=_('If set, this account is an external user, and '
-                                                       'has extra restrictions.'))
 
     @cached_property
     def organization(self):

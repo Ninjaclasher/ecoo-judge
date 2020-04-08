@@ -517,7 +517,7 @@ def problem_submit(request, problem=None, submission=None):
     if request.method == 'POST':
         form = ProblemSubmitForm(request.POST, instance=Submission(user=profile))
         if form.is_valid():
-            limit = 1 if profile.is_external_user else settings.DMOJ_SUBMISSION_LIMIT
+            limit = settings.DMOJ_SUBMISSION_LIMIT
 
             if (not request.user.has_perm('judge.spam_submission') and
                     Submission.objects.filter(user=profile, was_rejudged=False)

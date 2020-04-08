@@ -46,10 +46,9 @@ class ProfileAdmin(NoBatchDeleteMixin, VersionAdmin):
     fieldsets = (
         (None, {'fields': ('user', 'display_rank')}),
         (_('User Settings'), {'fields': ('organizations', 'timezone', 'language', 'ace_theme', 'math_engine')}),
-        (_('Administration'), {'fields': ('is_external_user', 'is_unlisted',
-                                          'last_access', 'ip', 'current_contest', 'notes')}),
+        (_('Administration'), {'fields': ('is_unlisted', 'last_access', 'ip', 'current_contest', 'notes')}),
     )
-    list_display = ('user', 'full_name', 'email', 'is_external_user',
+    list_display = ('user', 'full_name', 'email',
                     'date_joined', 'last_access', 'ip', 'show_public')
     ordering = ('user__username',)
     search_fields = ('user__username', 'user__first_name', 'user__last_name', 'ip', 'user__email')

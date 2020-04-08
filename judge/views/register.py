@@ -82,7 +82,6 @@ class RegistrationView(OldRegistrationView):
         user.save()
         profile.timezone = cleaned_data['timezone']
         profile.language = cleaned_data['language']
-        profile.is_external_user = True
         profile.save()
 
         if newsletter_id is not None and cleaned_data['newsletter']:

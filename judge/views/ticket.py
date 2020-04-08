@@ -43,15 +43,6 @@ class TicketForm(forms.Form):
         self.fields['title'].widget.attrs.update({'placeholder': _('Ticket title')})
         self.fields['body'].widget.attrs.update({'placeholder': _('Issue description')})
 
-    def clean(self):
-        if self.request is not None and self.request.user.is_authenticated:
-            profile = self.request.profile
-            if profile.is_external_user and \
-                Ticket.objects.filter(user=profile,
-                                      time__gte=timezone.now() - timezone.timedelta(minutes=10)).exists():
-                raise ValidationError(_('You may only make a ticket once every 10 minutes.'))
-        return super(TicketForm, self).clean()
-
 
 class NewTicketView(LoginRequiredMixin, SingleObjectFormView):
     form_class = TicketForm

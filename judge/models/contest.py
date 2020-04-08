@@ -62,8 +62,6 @@ class Contest(models.Model):
                                      help_text=_('Should be set even for organization-private contests, where it '
                                                  'determines whether the contest is visible to members of the '
                                                  'specified organizations.'))
-    is_external = models.BooleanField(verbose_name=_('external contest'), default=False,
-                                      help_text=_('Whether this contest is visible to external users.'))
     is_virtualable = models.BooleanField(verbose_name=_('virtualable'), default=True,
                                          help_text=_('Whether a user can virtually participate '
                                                      'in this contest or not.'))
@@ -376,8 +374,6 @@ class Contest(models.Model):
             queryset = queryset.filter(filter)
         if not user.has_perm('judge.edit_all_contest'):
             filter = Q(is_private=False, is_organization_private=False)
-            if not user.is_authenticated or profile.is_external_user:
-                filter &= Q(is_external=True)
             if user.is_authenticated:
                 filter |= Q(organizers=profile)
                 filter |= Q(is_private=False, is_organization_private=True,
