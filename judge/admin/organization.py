@@ -20,9 +20,9 @@ class OrganizationForm(ModelForm):
 
 class OrganizationAdmin(VersionAdmin):
     readonly_fields = ('creation_date',)
-    fields = ('name', 'slug', 'short_name', 'is_open', 'about', 'logo_override_image', 'slots', 'registrant',
+    fields = ('name', 'slug', 'short_name', 'about', 'logo_override_image', 'slots', 'registrant',
               'creation_date', 'admins')
-    list_display = ('name', 'short_name', 'is_open', 'slots', 'registrant', 'show_public')
+    list_display = ('name', 'short_name', 'slots', 'registrant', 'show_public')
     prepopulated_fields = {'slug': ('name',)}
     actions_on_top = True
     actions_on_bottom = True
@@ -47,13 +47,3 @@ class OrganizationAdmin(VersionAdmin):
         if request.user.has_perm('judge.edit_all_organization') or obj is None:
             return True
         return obj.admins.filter(id=request.profile.id).exists()
-
-
-class OrganizationRequestAdmin(admin.ModelAdmin):
-    list_display = ('username', 'organization', 'state', 'time')
-    readonly_fields = ('user', 'organization')
-
-    def username(self, obj):
-        return obj.user.user.username
-    username.short_description = _('username')
-    username.admin_order_field = 'user__user__username'

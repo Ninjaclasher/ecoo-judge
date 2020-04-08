@@ -10,7 +10,7 @@ from sortedm2m.fields import SortedManyToManyField
 from judge.models.choices import ACE_THEMES, MATH_ENGINES_CHOICES, TIMEZONE
 from judge.models.runtime import Language
 
-__all__ = ['Organization', 'Profile', 'OrganizationRequest']
+__all__ = ['Organization', 'Profile']
 
 
 class Organization(models.Model):
@@ -25,13 +25,9 @@ class Organization(models.Model):
     admins = models.ManyToManyField('Profile', verbose_name=_('administrators'), related_name='admin_of',
                                     help_text=_('Those who can edit this organization'))
     creation_date = models.DateTimeField(verbose_name=_('creation date'), auto_now_add=True)
-    is_open = models.BooleanField(verbose_name=_('is open organization?'),
-                                  help_text=_('Allow joining organization'), default=True)
     slots = models.IntegerField(verbose_name=_('maximum size'), null=True, blank=True,
                                 help_text=_('Maximum amount of users in this organization, '
                                             'only applicable to private organizations'))
-    access_code = models.CharField(max_length=7, help_text=_('Student access code'),
-                                   verbose_name=_('access code'), null=True, blank=True)
     logo_override_image = models.CharField(verbose_name=_('Logo override image'), default='', max_length=150,
                                            blank=True,
                                            help_text=_('This image will replace the default site logo for users '
@@ -131,20 +127,3 @@ class Profile(models.Model):
     class Meta:
         verbose_name = _('user profile')
         verbose_name_plural = _('user profiles')
-
-
-class OrganizationRequest(models.Model):
-    user = models.ForeignKey(Profile, verbose_name=_('user'), related_name='requests', on_delete=models.CASCADE)
-    organization = models.ForeignKey(Organization, verbose_name=_('organization'), related_name='requests',
-                                     on_delete=models.CASCADE)
-    time = models.DateTimeField(verbose_name=_('request time'), auto_now_add=True)
-    state = models.CharField(max_length=1, verbose_name=_('state'), choices=(
-        ('P', 'Pending'),
-        ('A', 'Approved'),
-        ('R', 'Rejected'),
-    ))
-    reason = models.TextField(verbose_name=_('reason'))
-
-    class Meta:
-        verbose_name = _('organization join request')
-        verbose_name_plural = _('organization join requests')

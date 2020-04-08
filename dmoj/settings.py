@@ -66,7 +66,6 @@ DMOJ_SUBMISSION_LIMIT = 2
 DMOJ_BLOG_NEW_PROBLEM_COUNT = 7
 DMOJ_BLOG_RECENTLY_ATTEMPTED_PROBLEMS_COUNT = 7
 DMOJ_TOTP_TOLERANCE_HALF_MINUTES = 1
-DMOJ_USER_MAX_ORGANIZATION_COUNT = 3
 DMOJ_COMMENT_VOTE_HIDE_THRESHOLD = -5
 DMOJ_PDF_PROBLEM_CACHE = ''
 DMOJ_PDF_PROBLEM_TEMP_DIR = tempfile.gettempdir()
@@ -179,7 +178,6 @@ else:
                     'icon': 'fa-user-plus',
                     'children': [
                         'judge.Organization',
-                        'judge.OrganizationRequest',
                     ],
                 },
                 {

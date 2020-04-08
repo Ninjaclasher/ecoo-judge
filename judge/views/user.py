@@ -113,7 +113,7 @@ class UserAboutPage(UserPage):
 def edit_profile(request):
     profile = Profile.objects.get(user=request.user)
     if request.method == 'POST':
-        form = ProfileForm(request.POST, instance=profile, user=request.user)
+        form = ProfileForm(request.POST, instance=profile)
         if form.is_valid():
             with transaction.atomic(), revisions.create_revision():
                 form.save()
@@ -132,7 +132,7 @@ def edit_profile(request):
 
             return HttpResponseRedirect(request.path)
     else:
-        form = ProfileForm(instance=profile, user=request.user)
+        form = ProfileForm(instance=profile)
         if newsletter_id is not None:
             try:
                 subscription = Subscription.objects.get(user=request.user, newsletter_id=newsletter_id)
