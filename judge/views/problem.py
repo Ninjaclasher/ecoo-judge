@@ -1,7 +1,6 @@
 import logging
 import os
 import shutil
-from datetime import timedelta
 from operator import itemgetter
 from random import randrange
 
@@ -11,7 +10,6 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.db import transaction
 from django.db.models import Count, F, Prefetch, Q
-from django.db.utils import ProgrammingError
 from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.template.loader import get_template
@@ -32,9 +30,9 @@ from judge.models import ContestProblem, ContestSubmission, Judge, Language, Pro
 from judge.pdf_problems import DefaultPdfMaker, HAS_PDF
 from judge.utils.diggpaginator import DiggPaginator
 from judge.utils.opengraph import generate_opengraph
-from judge.utils.problems import contest_attempted_ids, contest_completed_ids, hot_problems, user_attempted_ids, \
+from judge.utils.problems import contest_attempted_ids, contest_completed_ids, user_attempted_ids, \
     user_completed_ids
-from judge.utils.strings import safe_float_or_none, safe_int_or_none
+from judge.utils.strings import safe_float_or_none
 from judge.utils.tickets import own_ticket_filter
 from judge.utils.views import QueryStringSortMixin, SingleObjectFormView, TitleMixin, generic_message
 
@@ -385,10 +383,8 @@ class ProblemList(QueryStringSortMixin, TitleMixin, SolvedProblemMixin, ListView
         context.update(self.get_sort_paginate_context())
         if not self.in_contest:
             context.update(self.get_sort_context())
-            context['hot_problems'] = hot_problems(timedelta(days=1), 5)
             context['point_start'], context['point_end'], context['point_values'] = self.get_noui_slider_points()
         else:
-            context['hot_problems'] = None
             context['point_start'], context['point_end'], context['point_values'] = 0, 0, {}
             context['hide_contest_scoreboard'] = self.contest.hide_scoreboard
         return context

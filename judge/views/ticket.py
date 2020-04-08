@@ -3,13 +3,12 @@ import logging
 
 from django import forms
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.exceptions import ImproperlyConfigured, PermissionDenied, ValidationError
+from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.template.defaultfilters import truncatechars
 from django.template.loader import get_template
 from django.urls import reverse, reverse_lazy
-from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.html import escape, format_html, linebreaks
 from django.utils.safestring import mark_safe

@@ -1,6 +1,4 @@
-import itertools
 from datetime import datetime
-from operator import itemgetter
 
 from django.conf import settings
 from django.contrib.auth import logout as auth_logout
@@ -8,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import redirect_to_login
 from django.db import transaction
 from django.db.models import Max
-from django.http import Http404, HttpResponseRedirect, JsonResponse
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
@@ -19,11 +17,9 @@ from reversion import revisions
 
 from judge.forms import ProfileForm, newsletter_id
 from judge.models import Profile, Submission, Ticket
-from judge.performance_points import get_pp_breakdown
 from judge.utils.problems import contest_completed_ids, user_completed_ids
 from judge.utils.ranker import ranker
 from judge.utils.subscription import Subscription
-from judge.utils.unicode import utf8text
 from judge.utils.views import DiggPaginatorMixin, QueryStringSortMixin, TitleMixin, generic_message
 from .contests import ContestRanking
 

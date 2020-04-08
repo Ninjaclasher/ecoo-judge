@@ -1,5 +1,4 @@
 import json
-import re
 from calendar import Calendar, SUNDAY
 from collections import defaultdict, namedtuple
 from datetime import date, datetime, time, timedelta
