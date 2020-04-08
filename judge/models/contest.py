@@ -65,18 +65,6 @@ class Contest(models.Model):
     is_virtualable = models.BooleanField(verbose_name=_('virtualable'), default=True,
                                          help_text=_('Whether a user can virtually participate '
                                                      'in this contest or not.'))
-    require_registration = models.BooleanField(verbose_name=_('require registration'), default=False,
-                                               help_text=_('Whether the user must be registered before being '
-                                                           'able to join the contest.'))
-    registration_page = models.TextField(verbose_name=_('registration page'), blank=True, null=True,
-                                         help_text=_('Flatpage to display when registering. Use name="" for form '
-                                                     'identifiers that will be stored in the registrations.'))
-    registration_start_time = models.DateTimeField(verbose_name=_('registration start time'),
-                                                   help_text=_('Allow registration starting at the specified time.'),
-                                                   blank=True, null=True)
-    registration_end_time = models.DateTimeField(verbose_name=_('registration end time'),
-                                                 help_text=_('Allow registration until the specified time.'),
-                                                 blank=True, null=True)
     hide_scoreboard = models.BooleanField(verbose_name=_('hide scoreboard'),
                                           help_text=_('Whether the scoreboard should remain hidden for the duration '
                                                       'of the contest.'),
@@ -158,13 +146,6 @@ class Contest(models.Model):
         # Django will complain if you didn't fill in start_time or end_time, so we don't have to.
         if self.start_time and self.end_time and self.start_time >= self.end_time:
             raise ValidationError('What is this? A contest that ended before it starts?')
-        if self.require_registration:
-            if self.registration_start_time is None:
-                raise ValidationError('Registration start time field cannot be empty.')
-            elif self.registration_end_time is None:
-                raise ValidationError('Registration end time field cannot be empty.')
-            elif self.registration_start_time >= self.registration_end_time:
-                raise ValidationError('What is this? Registration ends before it starts?')
         self.format_class.validate(self.format_config)
 
         try:
@@ -258,19 +239,7 @@ class Contest(models.Model):
             return False
         return True
 
-    def can_register(self, user):
-        if self.require_registration:
-            if not self.registration_start_time <= self._now <= self.registration_end_time:
-                return False
-            return self.is_joinable_by(user, check_registered=False)
-        return False
-
-    def is_registered(self, user):
-        if not self.require_registration:
-            return True
-        return self.registrants.filter(user=user.profile).exists()
-
-    def is_joinable_by(self, user, check_registered=True):
+    def is_joinable_by(self, user):
         if not user.is_authenticated or not self.is_accessible_by(user):
             return False
         if self.ended:
@@ -280,9 +249,6 @@ class Contest(models.Model):
         if user.has_perm('judge.edit_own_contest') and \
                 self.organizers.filter(id=user.profile.id).exists():
             return True
-
-        if check_registered and not self.is_registered(user):
-            return False
 
         if not self.is_private and not self.is_organization_private and not self.is_private_viewable:
             return True
@@ -365,7 +331,7 @@ class Contest(models.Model):
     @classmethod
     def get_visible_contests(cls, user):
         profile = user.profile if user.is_authenticated else None
-        queryset = cls.objects.defer('description', 'registration_page')
+        queryset = cls.objects.defer('description')
 
         if not user.has_perm('judge.see_private_contest'):
             filter = Q(is_visible=True)
@@ -408,21 +374,6 @@ class Contest(models.Model):
         )
         verbose_name = _('contest')
         verbose_name_plural = _('contests')
-
-
-class ContestRegistration(models.Model):
-    contest = models.ForeignKey(Contest, verbose_name=_('associated contest'), related_name='registrants',
-                                on_delete=CASCADE)
-    user = models.ForeignKey(Profile, verbose_name=_('registrant'), related_name='contest_registrations',
-                             on_delete=CASCADE)
-    registration_time = models.DateTimeField(verbose_name=_('time of registration'), default=timezone.now)
-    data = JSONField(verbose_name=_('user registration data'), null=True, blank=True)
-
-    class Meta:
-        verbose_name = _('contest registration')
-        verbose_name_plural = _('contest registrations')
-
-        unique_together = ('contest', 'user')
 
 
 class ContestParticipation(models.Model):

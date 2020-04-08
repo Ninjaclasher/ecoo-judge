@@ -162,18 +162,6 @@
     {% endif %}
 {% endmacro %}
 
-{% macro contest_register(contest, user) %}
-    {% if contest.require_registration and contest.is_registered(user) %}
-        <a class="unselectable button full participate-button" style="pointer-events: none;">
-            {{ _('Registered') }}
-        </a>
-    {% elif contest.can_register(user) %}
-        <a href="{{ url('contest_register', contest.key) }}" class="unselectable button full participate-button">
-            {{ _('Register') }}
-        </a>
-    {% endif %}
-{% endmacro %}
-
 {% macro contest_join(contest, request) %}
     {% if not request.in_contest %}
         <td>
@@ -189,8 +177,6 @@
                     <input type="submit" class="unselectable button full participate-button join-warning"
                            value="{{ _('Join') }}">
                 </form>
-            {% else %}
-                {{ contest_register(contest, request.user) }}
             {% endif %}
         </td>
     {% endif %}
@@ -285,9 +271,6 @@
                     <thead>
                     <tr>
                         <th>{{ _('Contest') }}</th>
-                        {% if not request.in_contest %}
-                            <th style="width:10%"></th>
-                        {% endif %}
                     </tr>
                     </thead>
                     <tbody>
@@ -303,11 +286,6 @@
                                     {{ time_left(contest) }}
                                 </div>
                             </td>
-                            {% if not request.in_contest %}
-                                <td>
-                                    {{ contest_register(contest, request.user) }}
-                                </td>
-                            {% endif %}
                         </tr>
                     {% endfor %}
                     </tbody>

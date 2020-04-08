@@ -97,7 +97,6 @@ class ContestForm(ModelForm):
             'view_contest_scoreboard': AdminHeavySelect2MultipleWidget(data_view='profile_select2',
                                                                        attrs={'style': 'width: 100%'}),
             'description': AdminMartorWidget(attrs={'data-markdownfy-url': reverse_lazy('contest_preview')}),
-            'registration_page': AdminMartorWidget(attrs={'data-markdownfy-url': reverse_lazy('contest_preview')}),
         }
 
 
@@ -110,8 +109,6 @@ class ContestAdmin(NoBatchDeleteMixin, VersionAdmin):
         (_('Scheduling'), {'fields': ('start_time', 'end_time', 'time_limit')}),
         (_('Details'), {'fields': ('description', 'og_image', 'logo_override_image', 'tags', 'summary')}),
         (_('Format'), {'fields': ('format_name', 'format_config', 'problem_label_script')}),
-        (_('Registration'), {'fields': ('require_registration', 'registration_start_time',
-                                        'registration_end_time', 'registration_page')}),
         (_('Access'), {'fields': ('is_organization_private', 'is_private_viewable', 'organizations',
                                   'is_private', 'private_contestants', 'view_contest_scoreboard')}),
         (_('Justice'), {'fields': ('banned_users',)}),
@@ -298,16 +295,3 @@ class ContestParticipationAdmin(admin.ModelAdmin):
         return obj.virtual or '-'
     show_virtual.short_description = _('virtual')
     show_virtual.admin_order_field = 'virtual'
-
-
-class ContestRegistrationAdmin(admin.ModelAdmin):
-    fields = ('contest', 'user', 'registration_time', 'data')
-    list_display = ('contest', 'username', 'registration_time')
-    search_fields = ('contest__key', 'contest__name', 'user__user__username')
-    form = ContestParticipationForm
-    date_hierarchy = 'registration_time'
-
-    def username(self, obj):
-        return obj.user.username
-    username.short_description = _('username')
-    username.admin_order_field = 'user__user__username'

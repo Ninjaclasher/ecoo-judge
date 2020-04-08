@@ -168,7 +168,6 @@ else:
                     'icon': 'fa-bar-chart',
                     'children': [
                         'judge.ContestParticipation',
-                        'judge.ContestRegistration',
                         'judge.ContestTag',
                     ],
                 },

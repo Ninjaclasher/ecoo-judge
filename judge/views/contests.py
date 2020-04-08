@@ -30,7 +30,7 @@ from django.views.generic.detail import BaseDetailView, DetailView, SingleObject
 
 from judge import event_poster as event
 from judge.forms import ContestCloneForm
-from judge.models import Contest, ContestMoss, ContestParticipation, ContestProblem, ContestRegistration, \
+from judge.models import Contest, ContestMoss, ContestParticipation, ContestProblem, \
     ContestTag, Problem, Profile, Submission
 from judge.tasks import run_moss
 from judge.utils.celery import redirect_to_task_status
@@ -313,46 +313,6 @@ class ContestAccessCodeForm(forms.Form):
         self.fields['access_code'].widget.attrs.update({'autocomplete': 'off'})
 
 
-class ContestRegister(LoginRequiredMixin, ContestMixin, BaseDetailView):
-    def access_check(self, request):
-        contest = self.object
-        user = request.user
-        if not contest.can_register(user):
-            return generic_message(request, _('Cannot register for contest'),
-                                   _('You may not register for: "%s".') % contest.name)
-        if contest.is_registered(user):
-            return generic_message(request, _('Already registered'),
-                                   _('You have already registered for: "%s".') % contest.name)
-        return None
-
-    def get(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        error = self.access_check(request)
-        if error is not None:
-            return error
-
-        return render(request, 'contest/register.html', {
-            'title': _('Register for "%s"') % self.object.name,
-            'contest': self.object,
-        })
-
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        error = self.access_check(request)
-        if error is not None:
-            return error
-
-        data = {}
-        for field in re.findall(r'name="([\w:\-]+)"', self.object.registration_page):
-            data[field] = request.POST.get(field)
-
-        try:
-            ContestRegistration.objects.create(contest=self.object, user=request.profile, data=data)
-        except IntegrityError:
-            pass
-        return HttpResponseRedirect(reverse('contest_view', args=(self.object.key,)))
-
-
 class ContestJoin(LoginRequiredMixin, ContestMixin, BaseDetailView):
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -380,11 +340,7 @@ class ContestJoin(LoginRequiredMixin, ContestMixin, BaseDetailView):
             return generic_message(request, _('Already in contest'),
                                    _('You are already in a contest: "%s".') % profile.current_contest.contest.name)
 
-        if not contest.is_registered(request.user):
-            return generic_message(request, _('Cannot join contest'),
-                                   _('You have not registered for: "%s".') % contest.name)
-
-        if not contest.is_joinable_by(request.user, check_registered=False):
+        if not contest.is_joinable_by(request.user):
             return generic_message(request, _('Cannot join contest'),
                                    _('You do not have permission to join: "%s".') % contest.name)
 
