@@ -200,33 +200,6 @@
     }
 }
 
-#content-right {
-    &.contests {
-        flex: 20.0%;
-        max-width: unset;
-    }
-}
-
-#content-left {
-    &.contests {
-        flex: 80.0%;
-    }
-}
-
-label[for="rated-state"], label[for="tag"] {
-    padding-bottom: 0.25em;
-    display: block;
-}
-
-#rated-state {
-    margin-top: 0.5em;
-}
-
-#tags, #rated-state, #organizations {
-    width: 100%;
-    visibility: hidden;
-}
-
 .contest-participation-operation {
     float: right;
 

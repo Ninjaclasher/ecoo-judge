@@ -74,18 +74,8 @@ class ContestList(DiggPaginatorMixin, TitleMixin, ContestListMixin, ListView):
         return timezone.now()
 
     def _get_queryset(self):
-        queryset = super(ContestList, self).get_queryset() \
+        return super(ContestList, self).get_queryset() \
             .order_by('-start_time', 'key').prefetch_related('tags', 'organizations', 'organizers')
-
-        if self.search_query:
-            queryset = queryset.filter(Q(key__icontains=self.search_query) | Q(name__icontains=self.search_query))
-        if self.selected_tags:
-            queryset = queryset.filter(tags__in=self.selected_tags)
-        if self.selected_organizations:
-            queryset = queryset.filter(is_organization_private=True,
-                                       organizations__short_name__in=self.selected_organizations)
-
-        return queryset.distinct()
 
     def get_queryset(self):
         return self._get_queryset().filter(end_time__lt=self._now)
@@ -115,43 +105,8 @@ class ContestList(DiggPaginatorMixin, TitleMixin, ContestListMixin, ListView):
         context['now'] = self._now
         context['first_page_href'] = '.'
 
-        context['search_query'] = self.search_query
-
-        accessible_contests = super().get_queryset()
-
-        tag_ids = accessible_contests.values_list('tags', flat=True).distinct()
-        context['contest_tags'] = ContestTag.objects.filter(id__in=tag_ids)
-        context['selected_tags'] = self.selected_tags
-
-        organization_names = accessible_contests.filter(is_organization_private=True, organizations__isnull=False) \
-                                                .values_list('organizations__short_name', flat=True).distinct()
-        context['contest_organizations'] = organization_names
-        context['selected_organizations'] = self.selected_organizations
-
         context.update(paginate_query_context(self.request))
         return context
-
-    def setup_contest_list(self, request):
-        self.search_query = None
-        self.selected_tags = []
-        self.selected_organizations = []
-
-        if 'search' in request.GET:
-            self.search_query = ' '.join(request.GET.getlist('search')).strip()
-        if 'tag' in request.GET:
-            try:
-                self.selected_tags = list(map(int, request.GET.getlist('tag')))
-            except ValueError:
-                pass
-        if 'organization' in request.GET:
-            try:
-                self.selected_organizations = list(request.GET.getlist('organization'))
-            except ValueError:
-                pass
-
-    def get(self, request, *args, **kwargs):
-        self.setup_contest_list(request)
-        return super(ContestList, self).get(request, *args, **kwargs)
 
 
 class PrivateContestError(Exception):

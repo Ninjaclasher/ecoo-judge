@@ -52,44 +52,6 @@
             // });
         });
     </script>
-    {% compress js %}
-        <script>
-            $(function () {
-                var $form = $('form#filter-form');
-                var $search = $('#search');
-
-                function clean_submit() {
-                    prep_form();
-                    $form.submit();
-                }
-
-                $('#tags').select2({multiple: 1, placeholder: '{{ _('Filter by tag...') }}'})
-                    .css({'visibility': 'visible'});
-                $('#organizations').select2({multiple: 1, placeholder: '{{ _('Filter by organization...') }}'})
-                    .css({'visibility': 'visible'});
-
-                // This is incredibly nasty to do but it's needed because otherwise the select2 steals the focus
-                $search.keypress(function (e) {
-                    if (e.keyCode == 13)
-                        $('#go').click();
-                });
-
-                $('#go').click(clean_submit);
-
-                var info_float = $('.info-float');
-                var container = $('#content-right');
-                if (window.bad_browser) {
-                    container.css('float', 'right');
-                } else if (!featureTest('position', 'sticky')) {
-                    fix_div(info_float, 55);
-                    $(window).resize(function () {
-                        info_float.width(container.width());
-                    });
-                    info_float.width(container.width());
-                }
-            });
-        </script>
-    {% endcompress %}
 {% endblock %}
 
 {% block title_ruler %}{% endblock %}
@@ -184,11 +146,6 @@
 
 {% block body %}
     <div id="common-content" class="content-description">
-        <div id="content-right" class="contests">
-            <div class="info-float">
-                {% include "contest/search-form.html" %}
-            </div>
-        </div>
         <div id="content-left" class="contests">
             {% if active_participations %}
                 <h4>{{ _('Active Contests') }}</h4>
