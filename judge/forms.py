@@ -5,15 +5,13 @@ from django.conf import settings
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
-from django.db.models import Q
 from django.forms import CharField, Form, ModelForm
-from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 
 from django_ace import AceWidget
 from judge.models import Contest, Language, PrivateMessage, Problem, Profile, Submission
 from judge.utils.subscription import newsletter_id
-from judge.widgets import HeavyPreviewPageDownWidget, MathJaxPagedownWidget, PagedownWidget, Select2MultipleWidget, \
+from judge.widgets import MathJaxPagedownWidget, PagedownWidget, \
     Select2Widget
 
 

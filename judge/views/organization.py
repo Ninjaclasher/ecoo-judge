@@ -1,20 +1,11 @@
-from django import forms
-from django.conf import settings
-from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.cache import cache
-from django.core.cache.utils import make_template_fragment_key
-from django.core.exceptions import PermissionDenied
-from django.db import transaction
-from django.db.models import Count, Q
-from django.forms import Form, modelformset_factory
+from django.db.models import Count
 from django.http import Http404, HttpResponsePermanentRedirect, HttpResponseRedirect
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.translation import gettext as _, gettext_lazy, ungettext
-from django.views.generic import DetailView, FormView, ListView, UpdateView, View
-from django.views.generic.detail import SingleObjectMixin, SingleObjectTemplateResponseMixin
-from reversion import revisions
+from django.utils.translation import gettext as _, gettext_lazy
+from django.views.generic import DetailView, ListView, View
+from django.views.generic.detail import SingleObjectMixin
 
 from judge.models import BlogPost, Organization, Problem, Profile
 from judge.utils.views import TitleMixin, generic_message
