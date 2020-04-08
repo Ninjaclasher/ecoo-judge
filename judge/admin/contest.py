@@ -23,35 +23,6 @@ class AdminHeavySelect2Widget(AdminHeavySelect2Widget):
         return False
 
 
-class ContestTagForm(ModelForm):
-    contests = ModelMultipleChoiceField(
-        label=_('Included contests'),
-        queryset=Contest.objects.all(),
-        required=False,
-        widget=AdminHeavySelect2MultipleWidget(data_view='contest_select2'))
-
-
-class ContestTagAdmin(admin.ModelAdmin):
-    fields = ('name', 'color', 'description', 'contests')
-    list_display = ('name', 'color')
-    actions_on_top = True
-    actions_on_bottom = True
-    form = ContestTagForm
-    formfield_overrides = {
-        TextField: {'widget': AdminMartorWidget},
-    }
-
-    def save_model(self, request, obj, form, change):
-        super(ContestTagAdmin, self).save_model(request, obj, form, change)
-        obj.contests.set(form.cleaned_data['contests'])
-
-    def get_form(self, request, obj=None, **kwargs):
-        form = super(ContestTagAdmin, self).get_form(request, obj, **kwargs)
-        if obj is not None:
-            form.base_fields['contests'].initial = obj.contests.all()
-        return form
-
-
 class ContestProblemInlineForm(ModelForm):
     class Meta:
         widgets = {'problem': AdminHeavySelect2Widget(data_view='problem_select2')}
@@ -89,7 +60,6 @@ class ContestForm(ModelForm):
             'private_contestants': AdminHeavySelect2MultipleWidget(data_view='profile_select2',
                                                                    attrs={'style': 'width: 100%'}),
             'organizations': AdminHeavySelect2MultipleWidget(data_view='organization_select2'),
-            'tags': AdminSelect2MultipleWidget,
             'banned_users': AdminHeavySelect2MultipleWidget(data_view='profile_select2',
                                                             attrs={'style': 'width: 100%'}),
             'description': AdminMartorWidget(attrs={'data-markdownfy-url': reverse_lazy('contest_preview')}),
@@ -103,7 +73,7 @@ class ContestAdmin(NoBatchDeleteMixin, VersionAdmin):
                                     'freeze_submissions', 'hide_scoreboard',
                                     'permanently_hide_scoreboard', 'run_pretests_only', 'access_code')}),
         (_('Scheduling'), {'fields': ('start_time', 'end_time', 'time_limit')}),
-        (_('Details'), {'fields': ('description', 'og_image', 'logo_override_image', 'tags', 'summary')}),
+        (_('Details'), {'fields': ('description', 'og_image', 'logo_override_image', 'summary')}),
         (_('Format'), {'fields': ('format_name', 'format_config', 'problem_label_script')}),
         (_('Access'), {'fields': ('is_organization_private', 'is_private_viewable', 'organizations',
                                   'is_private', 'private_contestants')}),
