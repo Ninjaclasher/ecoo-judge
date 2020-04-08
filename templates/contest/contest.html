@@ -76,7 +76,6 @@
                 <thead>
                 <tr>
                     <th>{{ _('Problem') }}</th>
-                    <th>{{ _('AC Rate') }}</th>
                     <th>{{ _('Users') }}</th>
                     <th></th>
                 </tr>
@@ -92,7 +91,6 @@
                                     {{ problem.i18n_name }}
                                 {% endif %}
                             </td>
-                            <td>{{ problem.ac_rate|floatformat(1) }}%</td>
                             <td>
                                 {% if accessible %}
                                     <a href="{{ url('ranked_submissions', problem.code) }}">{{ problem.user_count }}</a>

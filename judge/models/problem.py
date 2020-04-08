@@ -109,7 +109,6 @@ class Problem(models.Model):
                                help_text=_('Plain-text, shown in meta description tag, e.g. for social media.'))
     user_count = models.IntegerField(verbose_name=_('number of users'), default=0,
                                      help_text=_('The number of users who solved the problem.'))
-    ac_rate = models.FloatField(verbose_name=_('solve rate'), default=0)
 
     objects = TranslatedProblemQuerySet.as_manager()
     tickets = GenericRelation('Ticket')
@@ -276,12 +275,6 @@ class Problem(models.Model):
     def update_stats(self):
         self.user_count = self.submission_set.filter(points__gte=self.points, result='AC',
                                                      user__is_unlisted=False).values('user').distinct().count()
-        submissions = self.submission_set.count()
-        if submissions:
-            self.ac_rate = 100.0 * self.submission_set.filter(points__gte=self.points, result='AC',
-                                                              user__is_unlisted=False).count() / submissions
-        else:
-            self.ac_rate = 0
         self.save()
 
     update_stats.alters_data = True
