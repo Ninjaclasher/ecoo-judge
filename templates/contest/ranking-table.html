@@ -45,6 +45,12 @@
     {% endfor %}
 {% endblock %}
 
+{% block point_head %}
+    <th class="header points">
+        {{ _('Points') }}
+    </th>
+{% endblock %}
+
 {% block row_extra %}
     {% if user.participation.is_disqualified %}
         class="disqualified"

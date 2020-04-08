@@ -41,11 +41,6 @@ DMOJ_REQUIRE_STAFF_2FA = True
 # Set to 0 to always use HTTP for links
 DMOJ_SSL = 0
 
-# Refer to dmoj.ca/post/103-point-system-rework
-DMOJ_PP_STEP = 0.95
-DMOJ_PP_ENTRIES = 100
-DMOJ_PP_BONUS_FUNCTION = lambda n: 300 * (1 - 0.997 ** n)  # noqa: E731
-
 NODEJS = '/usr/bin/node'
 EXIFTOOL = '/usr/bin/exiftool'
 ACE_URL = '//cdnjs.cloudflare.com/ajax/libs/ace/1.1.3'

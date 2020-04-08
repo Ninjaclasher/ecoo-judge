@@ -79,18 +79,6 @@ class UserPage(TitleMixin, UserMixin, DetailView):
         else:
             return user_completed_ids(self.profile) if self.profile is not None else ()
 
-    def get_context_data(self, **kwargs):
-        context = super(UserPage, self).get_context_data(**kwargs)
-
-        context['hide_solved'] = int(self.hide_solved)
-        context['authored'] = self.object.authored_problems.filter(is_public=True, is_organization_private=False) \
-                                  .order_by('code')
-        return context
-
-    def get(self, request, *args, **kwargs):
-        self.hide_solved = request.GET.get('hide_solved') == '1' if 'hide_solved' in request.GET else False
-        return super(UserPage, self).get(request, *args, **kwargs)
-
 
 EPOCH = datetime(1970, 1, 1, tzinfo=timezone.utc)
 
