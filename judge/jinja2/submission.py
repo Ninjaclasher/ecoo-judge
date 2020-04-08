@@ -19,9 +19,6 @@ def submission_layout(submission, profile_id, user, editable_problem_ids, comple
         can_view |= submission.problem.is_public or profile_id in submission.problem.tester_ids
 
     if user.has_perm('judge.view_all_submission'):
-        if submission.problem.is_public:
-            can_view = True
-        elif user.has_perm('judge.see_restricted_problem') or not submission.problem.is_restricted:
-            can_view = True
+        can_view = True
 
     return can_view

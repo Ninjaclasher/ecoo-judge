@@ -177,10 +177,7 @@ class Submission(models.Model):
             return True
 
         if user.has_perm('judge.view_all_submission'):
-            if problem.is_public:
-                return True
-            if user.has_perm('judge.see_restricted_problem') or not problem.is_restricted:
-                return True
+            return True
 
         if problem.is_public or problem.testers.filter(id=profile.id).exists():
             if problem.submission_set.filter(user_id=profile.id, result='AC',

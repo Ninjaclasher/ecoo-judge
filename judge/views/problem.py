@@ -227,10 +227,6 @@ class ProblemPdfView(ProblemMixin, SingleObjectMixin, View):
 
         problem = self.get_object()
 
-        if not problem.is_public and problem.is_restricted and \
-                not request.user.has_perm('judge.see_restricted_problem'):
-            raise Http404()
-
         try:
             trans = problem.translations.get(language=language)
         except ProblemTranslation.DoesNotExist:
