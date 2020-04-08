@@ -132,21 +132,15 @@ class Problem(models.Model):
     def is_editable_by(self, user):
         if not user.is_authenticated:
             return False
-        if user.has_perm('judge.edit_public_problem') and self.is_public:
-            return True
         if user.has_perm('judge.edit_all_problem'):
             return True
-        return user.has_perm('judge.edit_own_problem') and self.is_editor(user.profile)
+        return user.has_perm('judge.change_problem') and self.is_editor(user.profile)
 
     def is_accessible_by(self, user, skip_contest_problem_check=False):
         # Problem is public.
         if self.is_public:
             # Problem is not private to an organization.
             if not self.is_organization_private:
-                return True
-
-            # If the user can see all organization private problems.
-            if user.has_perm('judge.see_organization_problem'):
                 return True
 
             # If the user is in the organization.
@@ -156,10 +150,6 @@ class Problem(models.Model):
 
         if not user.is_authenticated:
             return False
-
-        # If the user can view all problems.
-        if user.has_perm('judge.see_private_problem'):
-            return True
 
         if self.is_editable_by(user):
             return True
@@ -190,24 +180,15 @@ class Problem(models.Model):
         if not user.is_authenticated:
             return cls.get_public_problems()
 
-        # Conditions for visible problem:
-        #   - `judge.edit_all_problem` or `judge.see_private_problem`
-        #   - otherwise
-        #       - not is_public problems
-        #           - author or curator or tester
-        #       - is_public problems
-        #           - not is_organization_private or in organization or `judge.see_organization_problem`
-        #           - author or curator or tester
         queryset = cls.objects.defer('description')
 
-        if not (user.has_perm('judge.see_private_problem') or user.has_perm('judge.edit_all_problem')):
+        if not user.has_perm('judge.edit_all_problem'):
             q = Q(is_public=True)
-            if not user.has_perm('judge.see_organization_problem'):
-                # Either not organization private or in the organization.
-                q &= (
-                    Q(is_organization_private=False) |
-                    Q(is_organization_private=True, organizations__in=user.profile.organizations.all())
-                )
+            # Either not organization private or in the organization.
+            q &= (
+                Q(is_organization_private=False) |
+                Q(is_organization_private=True, organizations__in=user.profile.organizations.all())
+            )
 
             # Authors, curators, and testers should always have access, so OR at the very end.
             q |= Q(authors=user.profile)
@@ -335,14 +316,7 @@ class Problem(models.Model):
 
     class Meta:
         permissions = (
-            ('see_private_problem', 'See hidden problems'),
-            ('edit_own_problem', 'Edit own problems'),
             ('edit_all_problem', 'Edit all problems'),
-            ('edit_public_problem', 'Edit all public problems'),
-            ('clone_problem', 'Clone problem'),
-            ('change_public_visibility', 'Change is_public field'),
-            ('change_manually_managed', 'Change is_manually_managed field'),
-            ('see_organization_problem', 'See organization-private problems'),
         )
         verbose_name = _('problem')
         verbose_name_plural = _('problems')

@@ -144,7 +144,7 @@ class SubmissionAdmin(admin.ModelAdmin):
         return False
 
     def has_change_permission(self, request, obj=None):
-        if not request.user.has_perm('judge.edit_own_problem'):
+        if not request.user.has_perm('judge.change_problem'):
             return False
         if obj is None:
             return True
@@ -156,7 +156,7 @@ class SubmissionAdmin(admin.ModelAdmin):
         return super(SubmissionAdmin, self).lookup_allowed(key, value) or key in ('problem__code',)
 
     def judge(self, request, queryset):
-        if not request.user.has_perm('judge.rejudge_submission') or not request.user.has_perm('judge.edit_own_problem'):
+        if not request.user.has_perm('judge.rejudge_submission') or not request.user.has_perm('judge.change_problem'):
             self.message_user(request, gettext('You do not have the permission to rejudge submissions.'),
                               level=messages.ERROR)
             return
@@ -251,7 +251,7 @@ class SubmissionAdmin(admin.ModelAdmin):
         ] + super(SubmissionAdmin, self).get_urls()
 
     def judge_view(self, request, id):
-        if not request.user.has_perm('judge.rejudge_submission') or not request.user.has_perm('judge.edit_own_problem'):
+        if not request.user.has_perm('judge.rejudge_submission') or not request.user.has_perm('judge.change_problem'):
             raise PermissionDenied()
         submission = get_object_or_404(Submission, id=id)
         if not request.user.has_perm('judge.edit_all_problem') and \

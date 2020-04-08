@@ -159,11 +159,9 @@
             </div>
         {% endif %}
 
-        {% if perms.judge.clone_problem %}
-            <div>
-                <a href="{{ url('problem_clone', problem.code) }}">{{ _('Clone problem') }}</a>
-            </div>
-        {% endif %}
+        <div>
+            <a href="{{ url('problem_clone', problem.code) }}">{{ _('Clone problem') }}</a>
+        </div>
     {% elif request.user.is_authenticated and has_tickets %}
         <hr>
         <div>

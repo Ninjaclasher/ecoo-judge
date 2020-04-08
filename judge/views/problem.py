@@ -5,7 +5,6 @@ from operator import itemgetter
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.db import transaction
 from django.db.models import Count, Prefetch
@@ -509,11 +508,10 @@ def problem_submit(request, problem=None, submission=None):
     })
 
 
-class ProblemClone(ProblemMixin, PermissionRequiredMixin, TitleMixin, SingleObjectFormView):
+class ProblemClone(ProblemMixin, TitleMixin, SingleObjectFormView):
     title = _('Clone Problem')
     template_name = 'problem/clone.html'
     form_class = ProblemCloneForm
-    permission_required = 'judge.clone_problem'
 
     def get_object(self, queryset=None):
         problem = super().get_object(queryset)

@@ -139,25 +139,16 @@ class ProblemAdmin(NoBatchDeleteMixin, VersionAdmin):
     def get_actions(self, request):
         actions = super(ProblemAdmin, self).get_actions(request)
 
-        if request.user.has_perm('judge.change_public_visibility'):
-            func, name, desc = self.get_action('make_public')
-            actions[name] = (func, name, desc)
+        func, name, desc = self.get_action('make_public')
+        actions[name] = (func, name, desc)
 
-            func, name, desc = self.get_action('make_private')
-            actions[name] = (func, name, desc)
+        func, name, desc = self.get_action('make_private')
+        actions[name] = (func, name, desc)
 
         func, name, desc = self.get_action('update_publish_date')
         actions[name] = (func, name, desc)
 
         return actions
-
-    def get_readonly_fields(self, request, obj=None):
-        fields = self.readonly_fields
-        if not request.user.has_perm('judge.change_public_visibility'):
-            fields += ('is_public',)
-        if not request.user.has_perm('judge.change_manually_managed'):
-            fields += ('is_manually_managed',)
-        return fields
 
     def show_authors(self, obj):
         return ', '.join(map(attrgetter('user.username'), obj.authors.all()))
@@ -207,9 +198,7 @@ class ProblemAdmin(NoBatchDeleteMixin, VersionAdmin):
             return queryset
 
         access = Q()
-        if request.user.has_perm('judge.edit_public_problem'):
-            access |= Q(is_public=True)
-        if request.user.has_perm('judge.edit_own_problem'):
+        if request.user.has_perm('judge.change_problem'):
             access |= Q(authors__id=request.profile.id) | Q(curators__id=request.profile.id)
         return queryset.filter(access).distinct() if access else queryset.none()
 
