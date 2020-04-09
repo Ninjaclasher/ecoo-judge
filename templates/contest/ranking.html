@@ -195,7 +195,7 @@
             });
         </script>
     {% endif %}
-    {% if not contest.ended and last_msg and request.user.is_staff %}
+    {% if not contest.ended and last_msg %}
         <script type="text/javascript">
             $(function () {
                 var receiver = new EventReceiver(

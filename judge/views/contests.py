@@ -525,7 +525,7 @@ class ContestRankingBase(ContestMixin, TitleMixin, DetailView):
         users, problems = self.get_ranking_list()
         context['users'] = users
         context['problems'] = problems
-        context['last_msg'] = event.last()
+        context['last_msg'] = event.last() if self.request.user.is_staff else None
         context['tab'] = self.tab
         return context
 

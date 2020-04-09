@@ -246,7 +246,7 @@
         </script>
     {% endcompress %}
 
-    {% if dynamic_update and last_msg and request.user.is_staff %}
+    {% if dynamic_update and last_msg %}
         <script type="text/javascript">
             $(function () {
                 load_dynamic_update({{last_msg}});

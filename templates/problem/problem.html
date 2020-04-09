@@ -135,7 +135,9 @@
         </div>
     {% endif %}
     <div><a href="{{ url('chronological_submissions', problem.code) }}">{{ _('All submissions') }}</a></div>
-    <div><a href="{{ url('ranked_submissions', problem.code) }}">{{ _('Best submissions') }}</a></div>
+    {% if can_edit_problem %}
+        <div><a href="{{ url('ranked_submissions', problem.code) }}">{{ _('Best submissions') }}</a></div>
+    {% endif %}
     {% if editorial and editorial.is_public and 
             not (request.user.is_authenticated and request.profile.current_contest) %}
         <hr>

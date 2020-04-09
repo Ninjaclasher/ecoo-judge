@@ -14,6 +14,9 @@ class RankedSubmissions(ProblemSubmissions):
     dynamic_update = False
 
     def get_queryset(self):
+        if not self.problem.is_editable_by(self.request.user):
+            raise Http404()
+
         if self.in_contest:
             contest_join = '''INNER JOIN judge_contestsubmission AS cs ON (sub.id = cs.submission_id)
                               INNER JOIN judge_contestparticipation AS cp ON (cs.participation_id = cp.id)'''
@@ -66,22 +69,14 @@ class RankedSubmissions(ProblemSubmissions):
 
 class ContestRankedSubmission(ForceContestMixin, RankedSubmissions):
     def get_title(self):
-        if self.problem.is_accessible_by(self.request.user):
-            return _('Best solutions for %(problem)s in %(contest)s') % {
-                'problem': self.problem_name, 'contest': self.contest.name,
-            }
-        return _('Best solutions for problem %(number)s in %(contest)s') % {
-            'number': self.get_problem_number(self.problem), 'contest': self.contest.name,
+        return _('Best solutions for %(problem)s in %(contest)s') % {
+            'problem': self.problem_name, 'contest': self.contest.name,
         }
 
     def get_content_title(self):
-        if self.problem.is_accessible_by(self.request.user):
-            return format_html(_('Best solutions for <a href="{1}">{0}</a> in <a href="{3}">{2}</a>'),
-                               self.problem_name, reverse('problem_detail', args=[self.problem.code]),
-                               self.contest.name, reverse('contest_view', args=[self.contest.key]))
-        return format_html(_('Best solutions for problem {0} in <a href="{2}">{1}</a>'),
-                           self.get_problem_number(self.problem), self.contest.name,
-                           reverse('contest_view', args=[self.contest.key]))
+        return format_html(_('Best solutions for <a href="{1}">{0}</a> in <a href="{3}">{2}</a>'),
+                           self.problem_name, reverse('problem_detail', args=[self.problem.code]),
+                           self.contest.name, reverse('contest_view', args=[self.contest.key]))
 
     def _get_queryset(self):
         return super()._get_queryset().filter(contest_object=self.contest)

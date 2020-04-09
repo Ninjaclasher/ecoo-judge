@@ -345,7 +345,7 @@ class AllUserSubmissions(ConditionalUserTabMixin, UserMixin, SubmissionsListBase
 
     def get_context_data(self, **kwargs):
         context = super(AllUserSubmissions, self).get_context_data(**kwargs)
-        context['dynamic_update'] = context['page_obj'].number == 1
+        context['dynamic_update'] = context['page_obj'].number == 1 and self.request.user.is_staff
         context['dynamic_user_id'] = self.profile.id
         context['last_msg'] = event.last()
         return context
@@ -392,10 +392,11 @@ class ProblemSubmissionsBase(SubmissionsListBase):
     def get_context_data(self, **kwargs):
         context = super(ProblemSubmissionsBase, self).get_context_data(**kwargs)
         if self.dynamic_update:
-            context['dynamic_update'] = context['page_obj'].number == 1
+            context['dynamic_update'] = context['page_obj'].number == 1 and self.request.user.is_staff
             context['dynamic_problem_id'] = self.problem.id
             context['last_msg'] = event.last()
-        context['best_submissions_link'] = reverse('ranked_submissions', kwargs={'problem': self.problem.code})
+        if self.problem.is_editable_by(self.request.user):
+            context['best_submissions_link'] = reverse('ranked_submissions', kwargs={'problem': self.problem.code})
         return context
 
 
@@ -481,7 +482,7 @@ class AllSubmissions(SubmissionsListBase):
 
     def get_context_data(self, **kwargs):
         context = super(AllSubmissions, self).get_context_data(**kwargs)
-        context['dynamic_update'] = context['page_obj'].number == 1
+        context['dynamic_update'] = context['page_obj'].number == 1 and self.request.user.is_staff
         context['last_msg'] = event.last()
         context['stats_update_interval'] = self.stats_update_interval
         return context
@@ -509,16 +510,10 @@ class ForceContestMixin(object):
         return self._contest
 
     def access_check(self, request):
-        # super(ForceContestMixin, self).access_check(request)
+        super(ForceContestMixin, self).access_check(request)
 
-        if not request.user.has_perm('judge.edit_all_contest'):
-            if not self.contest.is_visible:
-                raise Http404()
-            if self.contest.start_time is not None and self.contest.start_time > timezone.now():
-                raise Http404()
-
-    def get_problem_number(self, problem):
-        return self.contest.contest_problems.select_related('problem').get(problem=problem).order
+        if not self.contest.is_editable_by(self.request.user):
+            raise Http404()
 
     def get(self, request, *args, **kwargs):
         if 'contest' not in kwargs:
@@ -529,10 +524,7 @@ class ForceContestMixin(object):
 
 class UserContestSubmissions(ForceContestMixin, UserProblemSubmissions):
     def get_title(self):
-        if self.problem.is_accessible_by(self.request.user):
-            return "%s's submissions for %s in %s" % (self.username, self.problem_name, self.contest.name)
-        return "%s's submissions for problem %s in %s" % (
-            self.username, self.get_problem_number(self.problem), self.contest.name)
+        return "%s's submissions for %s in %s" % (self.username, self.problem_name, self.contest.name)
 
     def access_check(self, request):
         super(UserContestSubmissions, self).access_check(request)
@@ -540,14 +532,8 @@ class UserContestSubmissions(ForceContestMixin, UserProblemSubmissions):
             raise Http404()
 
     def get_content_title(self):
-        if self.problem.is_accessible_by(self.request.user):
-            return format_html(_('<a href="{1}">{0}</a>\'s submissions for '
-                                 '<a href="{3}">{2}</a> in <a href="{5}">{4}</a>'),
-                               self.username, reverse('user_page', args=[self.username]),
-                               self.problem_name, reverse('problem_detail', args=[self.problem.code]),
-                               self.contest.name, reverse('contest_view', args=[self.contest.key]))
         return format_html(_('<a href="{1}">{0}</a>\'s submissions for '
-                             'problem {2} in <a href="{4}">{3}</a>'),
+                             '<a href="{3}">{2}</a> in <a href="{5}">{4}</a>'),
                            self.username, reverse('user_page', args=[self.username]),
-                           self.get_problem_number(self.problem),
+                           self.problem_name, reverse('problem_detail', args=[self.problem.code]),
                            self.contest.name, reverse('contest_view', args=[self.contest.key]))
