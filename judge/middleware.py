@@ -1,4 +1,6 @@
-from django.urls import Resolver404, resolve
+from django.http import HttpResponseRedirect
+from django.urls import Resolver404, resolve, reverse
+from django.utils.http import urlquote
 
 
 class ShortCircuitMiddleware:
@@ -53,3 +55,18 @@ class ContestMiddleware(object):
             request.in_contest = False
             request.participation = None
         return self.get_response(request)
+
+class ECOOForceLoginMiddleware(object):
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        if request.user.is_authenticated:
+            return self.get_response(request)
+
+        url_name = resolve(request.path_info).url_name
+        if (url_name in ('auth_login', 'auth_logout', 'home')):
+            return self.get_response(request)
+
+        login_path = reverse('auth_login')
+        return HttpResponseRedirect(login_path + '?next=' + urlquote(request.get_full_path()))

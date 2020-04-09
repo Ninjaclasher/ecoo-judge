@@ -230,6 +230,7 @@ MIDDLEWARE = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'judge.middleware.DMOJLoginMiddleware',
+    'judge.middleware.ECOOForceLoginMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'judge.user_log.LogUserAccessMiddleware',
