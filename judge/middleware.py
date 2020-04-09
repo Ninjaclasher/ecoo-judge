@@ -67,7 +67,7 @@ class ForceLoginMiddleware(object):
             return self.get_response(request)
 
         url_name = resolve(request.path_info).url_name
-        if (url_name in ('auth_login', 'auth_logout', 'home')):
+        if url_name in ('auth_login', 'auth_logout', 'home'):
             return self.get_response(request)
 
         login_path = reverse('auth_login')

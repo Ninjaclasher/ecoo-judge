@@ -177,7 +177,7 @@ class Problem(models.Model):
 
     @classmethod
     def get_public_problems(cls):
-        return cls.objects.filter(is_public=True, is_organization_private=False).defer('description').distinct()
+        return cls.objects.filter(is_public=True, is_organization_private=False).defer('description')
 
     def __str__(self):
         return self.name
