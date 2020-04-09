@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.urls import Resolver404, resolve, reverse
 from django.utils.http import urlquote
@@ -56,12 +57,12 @@ class ContestMiddleware(object):
             request.participation = None
         return self.get_response(request)
 
-class ECOOForceLoginMiddleware(object):
+class ForceLoginMiddleware(object):
     def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
-        if request.user.is_authenticated:
+        if request.user.is_authenticated or not settings.DMOJ_FORCE_LOGIN:
             return self.get_response(request)
 
         url_name = resolve(request.path_info).url_name
