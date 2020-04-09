@@ -57,6 +57,7 @@ class ContestMiddleware(object):
             request.participation = None
         return self.get_response(request)
 
+
 class ForceLoginMiddleware(object):
     def __init__(self, get_response):
         self.get_response = get_response
