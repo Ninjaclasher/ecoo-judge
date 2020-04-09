@@ -63,7 +63,7 @@ class SubmissionTestCaseInline(admin.TabularInline):
 
 
 class ContestSubmissionInline(admin.StackedInline):
-    fields = ('problem', 'participation', 'points', 'bonus', 'updated_frozen')
+    fields = ('problem', 'participation', 'points', 'updated_frozen')
     readonly_fields = ('updated_frozen',)
     model = ContestSubmission
 

@@ -272,7 +272,8 @@ class SubmissionsListBase(DiggPaginatorMixin, TitleMixin, ListView):
         context['completed_problem_ids'] = user_completed_ids(self.request.profile) if authenticated else []
         context['authored_problem_ids'] = user_authored_ids(self.request.profile) if authenticated else []
         context['editable_problem_ids'] = user_editable_ids(self.request.profile) if authenticated else []
-        context['visible_contest_ids'] = set(Contest.get_visible_contests(self.request.user).values_list('id', flat=True))
+        context['visible_contest_ids'] = set(Contest.get_visible_contests(self.request.user)
+                                                    .values_list('id', flat=True))
 
         context['all_languages'] = Language.objects.all().values_list('key', 'name')
         context['selected_languages'] = self.selected_languages

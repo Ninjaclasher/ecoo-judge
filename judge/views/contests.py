@@ -433,8 +433,6 @@ ContestRankingProfile = namedtuple(
     'problem_cells result_cell',
 )
 
-BestSolutionData = namedtuple('BestSolutionData', 'code points bonus time state is_pretested')
-
 
 def make_contest_ranking_profile(contest, participation, contest_problems):
     def display_user_problem(contest_problem):

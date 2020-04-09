@@ -143,19 +143,6 @@ class Submission(models.Model):
         if not contest_problem.partial and contest.points != contest_problem.points:
             contest.points = 0
 
-        contest.bonus = 0
-        if contest.points != 0 and not participation.spectate:
-            config = participation.contest.format.config
-            if config:
-                time_bonus = config.get('time_bonus') or 0
-                first_submission_bonus = config.get('first_submission_bonus') or 0
-                if time_bonus:
-                    dt = (participation.end_time - self.date).total_seconds()
-                    contest.bonus = (contest.points / contest_problem.points) * (dt // (60 * time_bonus))
-                if first_submission_bonus and contest.points == contest_problem.points and \
-                        not participation.submissions.filter(problem=contest_problem,
-                                                             submission__date__lt=self.date).exists():
-                    contest.bonus += first_submission_bonus
         contest.save()
         participation.recompute_results()
 
