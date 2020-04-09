@@ -1,13 +1,10 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Count
-from django.http import Http404, HttpResponsePermanentRedirect, HttpResponseRedirect
-from django.urls import reverse
+from django.http import Http404, HttpResponsePermanentRedirect
 from django.utils import timezone
 from django.utils.translation import gettext as _, gettext_lazy
-from django.views.generic import DetailView, ListView, View
-from django.views.generic.detail import SingleObjectMixin
+from django.views.generic import DetailView, ListView
 
-from judge.models import BlogPost, Organization, Problem, Profile
+from judge.models import BlogPost, Organization, Problem
 from judge.utils.views import TitleMixin, generic_message
 
 __all__ = ['OrganizationList', 'OrganizationHome']
@@ -72,9 +69,6 @@ class OrganizationHome(OrganizationDetailView):
         context['title'] = self.object.name
         context['can_edit'] = self.can_edit_organization()
         context['is_member'] = self.request.profile in self.object if self.request.user.is_authenticated else False
-        context['new_problems'] = Problem.objects.filter(is_public=True, is_organization_private=True,
-                                                         organizations=self.object) \
-                                                 .order_by('-date', '-id')[:7]
         context['posts'] = BlogPost.objects.filter(visible=True, publish_on__lte=timezone.now(),
                                                    is_organization_private=True, organizations=self.object) \
                                            .order_by('-sticky', '-publish_on') \
