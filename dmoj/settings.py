@@ -140,6 +140,9 @@ else:
                 {
                     'model': 'judge.Problem',
                     'icon': 'fa-question-circle',
+                    'children': [
+                        'judge.Solution',
+                    ],
                 },
                 {
                     'model': 'judge.Submission',
@@ -161,7 +164,6 @@ else:
                     'icon': 'fa-user',
                     'children': [
                         'auth.Group',
-                        'registration.RegistrationProfile',
                     ],
                 },
                 {
@@ -182,7 +184,6 @@ else:
                 },
                 ('judge.BlogPost', 'fa-rss-square'),
                 ('flatpages.FlatPage', 'fa-file-text-o'),
-                ('judge.Solution', 'fa-pencil'),
             ],
             'dashboard': {
                 'breadcrumbs': True,
@@ -201,7 +202,6 @@ INSTALLED_APPS += (
     'django.contrib.redirects',
     'django.contrib.staticfiles',
     'django.contrib.sites',
-    'registration',
     'mptt',
     'reversion',
     'compressor',
