@@ -4,7 +4,7 @@ from django.utils import timezone
 from django.utils.translation import gettext as _, gettext_lazy
 from django.views.generic import DetailView, ListView
 
-from judge.models import BlogPost, Organization, Problem
+from judge.models import BlogPost, Organization
 from judge.utils.views import TitleMixin, generic_message
 
 __all__ = ['OrganizationList', 'OrganizationHome']
