@@ -10,7 +10,7 @@ from django.views.generic.detail import SingleObjectMixin
 from judge.models import BlogPost, Organization, Problem, Profile
 from judge.utils.views import TitleMixin, generic_message
 
-__all__ = ['OrganizationList', 'OrganizationHome', 'OrganizationUsers', 'KickUserWidgetView']
+__all__ = ['OrganizationList', 'OrganizationHome']
 
 
 class OrganizationMixin(object):
@@ -80,40 +80,3 @@ class OrganizationHome(OrganizationDetailView):
                                            .order_by('-sticky', '-publish_on') \
                                            .prefetch_related('authors__user', 'organizations')
         return context
-
-
-class OrganizationUsers(OrganizationDetailView):
-    template_name = 'organization/users.html'
-
-    def get_context_data(self, **kwargs):
-        context = super(OrganizationUsers, self).get_context_data(**kwargs)
-        context['title'] = _('%s Members') % self.object.name
-        context['users'] = \
-            enumerate(self.object.members.filter(is_unlisted=False).order_by('id')
-                      .select_related('user').defer('notes'), 1)
-        context['partial'] = True
-        context['is_admin'] = self.can_edit_organization()
-        context['kick_url'] = reverse('organization_user_kick', args=[self.object.id, self.object.slug])
-        return context
-
-
-class KickUserWidgetView(LoginRequiredMixin, OrganizationMixin, SingleObjectMixin, View):
-    def post(self, request, *args, **kwargs):
-        organization = self.get_object()
-        if not self.can_edit_organization(organization):
-            return generic_message(request, _("Can't edit organization"),
-                                   _('You are not allowed to kick people from this organization.'), status=403)
-
-        try:
-            user = Profile.objects.get(id=request.POST.get('user', None))
-        except Profile.DoesNotExist:
-            return generic_message(request, _("Can't kick user"),
-                                   _('The user you are trying to kick does not exist!'), status=400)
-
-        if not organization.members.filter(id=user.id).exists():
-            return generic_message(request, _("Can't kick user"),
-                                   _('The user you are trying to kick is not in organization: %s.') %
-                                   organization.name, status=400)
-
-        organization.members.remove(user)
-        return HttpResponseRedirect(organization.get_users_url())

@@ -141,11 +141,12 @@ class UserList(DiggPaginatorMixin, TitleMixin, ListView):
     def get_queryset(self):
         return (Profile.objects.filter(is_unlisted=False)
                 .order_by('id').select_related('user')
-                .only('display_rank', 'user__username'))
+                .only('id', 'display_rank', 'user__username'))
 
     def get_context_data(self, **kwargs):
         context = super(UserList, self).get_context_data(**kwargs)
-        context['users'] = enumerate(context['users'], self.paginate_by * (context['page_obj'].number - 1) + 1)
+        context['rank_header'] = _('Id')
+        context['users'] = list(map(lambda user: (user.id, user), context['users']))
         context['first_page_href'] = '.'
         return context
 

@@ -154,8 +154,6 @@ urlpatterns = [
     url(r'^organizations/$', organization.OrganizationList.as_view(), name='organization_list'),
     url(r'^organization/(?P<pk>\d+)-(?P<slug>[\w-]*)', include([
         url(r'^$', organization.OrganizationHome.as_view(), name='organization_home'),
-        url(r'^/users$', organization.OrganizationUsers.as_view(), name='organization_users'),
-        url(r'^/kick$', organization.KickUserWidgetView.as_view(), name='organization_user_kick'),
         url(r'^/$', lambda _, pk, slug: HttpResponsePermanentRedirect(reverse('organization_home', args=[pk, slug]))),
     ])),
 

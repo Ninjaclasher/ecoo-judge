@@ -13,42 +13,8 @@
     </style>
 {% endblock %}
 
-{% block js_media %}
-    <script type="text/javascript">
-        $(document).ready(function () {
-            $('.time-remaining').each(function () {
-                count_down($(this));
-            });
-
-            $('.blog-sidebar').hide();
-            $('#info-tab').find('a').click(function (e) {
-                e.preventDefault();
-                $('#info-tab').addClass('active');
-                $('#detail-tab').removeClass('active');
-                $('.blog-content').show();
-                $('.blog-sidebar').hide();
-            });
-            $('#detail-tab').find('a').click(function (e) {
-                e.preventDefault();
-                $('#detail-tab').addClass('active');
-                $('#info-tab').removeClass('active');
-                $('.blog-content').hide();
-                $('.blog-sidebar').show();
-            });
-        });
-    </script>
-{% endblock %}
-
 {% block body %}
     {% block before_posts %}{% endblock %}
-    <div id="mobile" class="tabs">
-        <ul>
-            <li id="info-tab" class="tab active"><a href="#">
-                <i class="tab-icon fa fa-info-circle"></i> {{ _('Info') }}
-            </a></li>
-            <li id="detail-tab" class="tab"><a href="#"><i class="tab-icon fa fa-rss"></i> {{ _('Details') }}</a></li>
-        </ul>
-    </div>
     <div id="blog-container">
         <div class="blog-content sidebox">
             <h3>{{ _('About') }} {{ organization.name }} <i class="fa fa-info-circle"></i></h3>
@@ -70,35 +36,6 @@
                             <i>{{ _('There is no news at this time.') }}</i>
                         </div>
                     {% endfor %}
-                </div>
-            {% endif %}
-        </div>
-
-        <div class="blog-sidebar">
-            <div class="blog-sidebox sidebox">
-                <h3>{{ _('Controls') }} <i class="fa fa-cog"></i></h3>
-                <div class="sidebox-content" style="padding: 1em;">
-                    {% if perms.judge.change_organization %}
-                        <div>
-                            <a href="{{ url('admin:judge_organization_change', organization.id) }}">{{ _('Admin organization') }}</a>
-                        </div>
-                    {% endif %}
-                    <div>
-                        <a href="{{ organization.get_users_url() }}">{{ _('View members') }}</a>
-                    </div>
-                </div>
-            </div>
-            {% if (is_member or can_edit) and new_problems %}
-                <div class="blog-sidebox sidebox">
-                    <h3>{{ _('New Private Problems') }} <i class="fa fa-puzzle-piece"></i>
-                    </h3>
-                    <div class="sidebox-content">
-                        <ul class="problem-list">
-                            {% for problem in new_problems %}
-                                <li><a href="{{ url('problem_detail', problem.code) }}">{{ problem.name }}</a></li>
-                            {% endfor %}
-                        </ul>
-                    </div>
                 </div>
             {% endif %}
         </div>
