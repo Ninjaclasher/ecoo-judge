@@ -41,9 +41,6 @@ class Contest(models.Model):
                                                       help_text=('Whether the scoreboard should remain hidden '
                                                                  'permanently. Requires "hide scoreboard" to be '
                                                                  'set as well to have any effect.'))
-    use_clarifications = models.BooleanField(verbose_name=_('no comments'),
-                                             help_text=_("Use clarification system instead of comments."),
-                                             default=True)
     is_organization_private = models.BooleanField(verbose_name=_('completely private to organizations'),
                                                   help_text=_('Whether only specified organizations can view '
                                                               'and join this contest.'),
