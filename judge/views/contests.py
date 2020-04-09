@@ -85,7 +85,7 @@ class ContestList(DiggPaginatorMixin, TitleMixin, ContestListMixin, ListView):
         if self.request.user.is_authenticated:
             for participation in ContestParticipation.objects.filter(virtual=0, user=self.request.profile,
                                                                      contest_id__in=present) \
-                    .select_related('contest').prefetch_related('contest__organizers'):
+                    .select_related('contest').prefetch_related('contest__organizations', 'contest__organizers'):
                 if not participation.ended:
                     active.append(participation)
                     present.remove(participation.contest)
@@ -163,11 +163,6 @@ class ContestMixin(object):
 
     def get_object(self, queryset=None):
         contest = super(ContestMixin, self).get_object(queryset)
-
-        profile = self.request.profile
-        if (profile is not None and
-                ContestParticipation.objects.filter(id=profile.current_contest_id, contest_id=contest.id).exists()):
-            return contest
 
         try:
             contest.access_check(self.request.user)

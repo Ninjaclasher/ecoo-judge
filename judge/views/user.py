@@ -110,9 +110,8 @@ class UserAboutPage(UserPage):
 
 @login_required
 def edit_profile(request):
-    profile = Profile.objects.get(user=request.user)
     if request.method == 'POST':
-        form = ProfileForm(request.POST, instance=profile)
+        form = ProfileForm(request.POST, instance=request.profile)
         if form.is_valid():
             with transaction.atomic(), revisions.create_revision():
                 form.save()
@@ -121,11 +120,11 @@ def edit_profile(request):
 
             return HttpResponseRedirect(request.path)
     else:
-        form = ProfileForm(instance=profile)
+        form = ProfileForm(instance=request.profile)
 
     tzmap = settings.TIMEZONE_MAP
     return render(request, 'user/edit-profile.html', {
-        'form': form, 'title': _('Edit profile'), 'profile': profile,
+        'form': form, 'title': _('Edit profile'),
         'has_math_config': bool(settings.MATHOID_URL),
         'TIMEZONE_MAP': tzmap or 'http://momentjs.com/static/img/world.png',
         'TIMEZONE_BG': settings.TIMEZONE_BG if tzmap else '#4E7CAD',
