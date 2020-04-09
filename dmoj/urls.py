@@ -145,9 +145,6 @@ urlpatterns = [
         url(r'^/submissions/(?P<user>\w+)/(?P<problem>\w+)/',
             paged_list_view(submission.UserContestSubmissions, 'contest_user_submissions')),
 
-        url(r'^/participations$', contests.ContestParticipationList.as_view(), name='contest_participation_own'),
-        url(r'^/participations/(?P<user>\w+)$',
-            contests.ContestParticipationList.as_view(), name='contest_participation'),
         url(r'^/participation/disqualify$', contests.ContestParticipationDisqualify.as_view(),
             name='contest_participation_disqualify'),
 

@@ -26,10 +26,6 @@
             {%- if contest.is_in_contest(request.user) and not request.participation.live -%}
                 {% if request.participation.spectate %}
                     {{- _('Spectating, contest ends in %(countdown)s.', countdown=contest.time_before_end|as_countdown) -}}
-                {% elif request.participation.end_time %}
-                    {{- _('Participating virtually, %(countdown)s remaining.', countdown=request.participation.time_remaining|as_countdown) -}}
-                {% else %}
-                    {{- _('Participating virtually.') -}}
                 {% endif %}
             {%- else -%}
                 {% if contest.start_time > now %}

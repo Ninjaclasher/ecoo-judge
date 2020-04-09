@@ -243,9 +243,6 @@
                     <tr>
                         <th style="width:90%">{{ _('Contest') }}</th>
                         <th>{{ _('Users') }}</th>
-                        {% if not request.in_contest %}
-                            <th style="width:15%"></th>
-                        {% endif %}
                     </tr>
                     </thead>
                     <tbody>
@@ -260,17 +257,6 @@
                             <td>
                                 {{ user_count(contest, request.user) }}
                             </td>
-                            {% if not request.in_contest %}
-                                <td>
-                                    {% if contest.is_joinable_by(request.user) %}
-                                        <form action="{{ url('contest_join', contest.key) }}" method="post">
-                                            {% csrf_token %}
-                                            <input type="submit" class="unselectable button full participate-button"
-                                                   value="{{ _('Virtual join') }}">
-                                        </form>
-                                    {% endif %}
-                                </td>
-                            {% endif %}
                         </tr>
                     {% endfor %}
                     </tbody>

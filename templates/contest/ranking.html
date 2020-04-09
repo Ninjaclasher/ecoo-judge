@@ -176,19 +176,6 @@
             });
         </script>
     {% endif %}
-    {% if perms.judge.change_contestparticipation %}
-        <script type="text/javascript">
-            $(function () {
-                $('td.user').find('a.user-name').click(function (e) {
-                    var data = $(this).siblings('.edit-participation');
-                    if (e.altKey && data.length) {
-                        window.open(data.attr('data-link'), '_blank');
-                        return false;
-                    }
-                });
-            });
-        </script>
-    {% endif %}
     {% if not contest.ended %}
         <script type="text/javascript">
             $(function () {
@@ -231,45 +218,11 @@
             });
         </script>
     {% endif %}
-    <script type="text/javascript">
-        $(function () {
-            var url = '{{ url('contest_participation', contest.key, '__username__') }}';
-            var placeholder = $('#search-contest').replaceWith($('<select>').attr({
-                id: 'search-contest'
-            })).attr('placeholder');
-
-            $('#search-contest').select2({
-                placeholder: placeholder,
-                ajax: {
-                    url: '{{ url('contest_user_search_select2_ajax', contest.key) }}'
-                },
-                minimumInputLength: 1,
-                escapeMarkup: function (markup) {
-                    return markup;
-                },
-                templateResult: function (data, container) {
-                    return ('<img class="user-search-image" src="' + data.gravatar_url + '" width="24" height="24">' +
-                        '<span class="' + data.display_rank + ' user-search-name">' + data.text + '</span>');
-                }
-            }).on('change', function () {
-                window.location.href = url.replace('__username__', $(this).val());
-            });
-
-            $('#show-organizations-checkbox').click(function () {
-                $('.organization-column').toggle();
-            });
-        });
-    </script>
     {% include "contest/media-js.html" %}
 {% endblock %}
 
 {% block users_table %}
     <div style="margin-bottom: 0.5em">
-        {% if tab == 'participation' %}
-            {% if contest.can_see_full_scoreboard(request.user) %}
-                <input id="search-contest" type="text" placeholder="{{ _('View user participation') }}">
-            {% endif %}
-        {% endif %}
         {% if tab == 'ranking' and contest.freeze_submissions %}
             <div class="alert alert-warning" style="text-align: center;">
                 {{ _('Scoreboard is frozen for this contest.') }}

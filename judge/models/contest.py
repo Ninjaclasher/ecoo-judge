@@ -33,9 +33,6 @@ class Contest(models.Model):
                                      help_text=_('Should be set even for organization-private contests, where it '
                                                  'determines whether the contest is visible to members of the '
                                                  'specified organizations.'))
-    is_virtualable = models.BooleanField(verbose_name=_('virtualable'), default=True,
-                                         help_text=_('Whether a user can virtually participate '
-                                                     'in this contest or not.'))
     hide_scoreboard = models.BooleanField(verbose_name=_('hide scoreboard'),
                                           help_text=_('Whether the scoreboard should remain hidden for the duration '
                                                       'of the contest.'),
@@ -207,8 +204,6 @@ class Contest(models.Model):
     def is_joinable_by(self, user):
         if not user.is_authenticated or not self.is_accessible_by(user):
             return False
-        if self.ended:
-            return self.is_virtualable
 
         if user.has_perm('judge.edit_own_contest') and \
                 self.organizers.filter(id=user.profile.id).exists():
