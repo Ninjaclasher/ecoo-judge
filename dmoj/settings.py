@@ -140,9 +140,6 @@ else:
                 {
                     'model': 'judge.Problem',
                     'icon': 'fa-question-circle',
-                    'children': [
-                        'judge.Solution',
-                    ],
                 },
                 {
                     'model': 'judge.Submission',
