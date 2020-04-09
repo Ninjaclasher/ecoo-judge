@@ -330,9 +330,9 @@ class ContestJoin(LoginRequiredMixin, ContestMixin, BaseDetailView):
         contest.update_user_count()
 
         first_problem = contest.contest_problems.order_by('order').values_list('problem__code', flat=True).first()
-        if not first_problem:
-            return HttpResponseRedirect(reverse('problem_list'))
-        return HttpResponseRedirect(reverse('problem_detail', args=(first_problem,)))
+        if first_problem is not None:
+            return HttpResponseRedirect(reverse('problem_detail', args=(first_problem,)))
+        return HttpResponseRedirect(reverse('problem_list'))
 
     def ask_for_access_code(self, form=None):
         contest = self.object
