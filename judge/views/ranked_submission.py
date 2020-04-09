@@ -1,3 +1,4 @@
+from django.http import Http404
 from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.translation import gettext as _
@@ -14,7 +15,7 @@ class RankedSubmissions(ProblemSubmissions):
     dynamic_update = False
 
     def get_queryset(self):
-        if not self.problem.is_editable_by(self.request.user):
+        if not self.request.user.is_staff:
             raise Http404()
 
         if self.in_contest:

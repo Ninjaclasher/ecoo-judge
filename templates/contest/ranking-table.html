@@ -24,10 +24,10 @@
 
 {% block before_point_head %}
     {% for problem in problems %}
-        <th class="points header"><a href="{{ url('contest_ranked_submissions', contest.key, problem.problem.code) }}">
+        <th class="points header">{% if request.user.is_staff %}<a href="{{ url('contest_ranked_submissions', contest.key, problem.problem.code) }}">{% endif %}
             {{- contest.get_label_for_problem(loop.index0) }}
             <div class="point-denominator">{{ problem.points }}</div>
-        </a></th>
+        {% if request.user.is_staff %}</a>{% endif %}</th>
     {% endfor %}
 {% endblock %}
 
