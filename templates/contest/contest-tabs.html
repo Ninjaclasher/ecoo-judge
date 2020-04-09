@@ -20,7 +20,8 @@
     {% endif %}
 
     {% if request.user.is_authenticated %}
-        {% if contest.can_join and contest.is_joinable_by(request.user) %}
+        {% set in_org = contest.organizations.filter(id__in=request.profile.organizations.all()).exists() %}
+        {% if (contest.can_join and (not contest.is_private_viewable or in_org)) or is_organizer %}
             {% set in_contest = contest.is_in_contest(request.user) %}
             {% if not contest.ended %}
                 {# Allow users to leave the contest #}

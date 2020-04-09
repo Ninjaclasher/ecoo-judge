@@ -198,24 +198,6 @@ class Contest(models.Model):
             return False
         return True
 
-    def is_joinable_by(self, user):
-        if not user.is_authenticated or not self.is_accessible_by(user):
-            return False
-
-        if user.has_perm('judge.edit_own_contest') and \
-                self.organizers.filter(id=user.profile.id).exists():
-            return True
-
-        if not self.is_private and not self.is_organization_private and not self.is_private_viewable:
-            return True
-
-        if (self.is_private_viewable or self.is_organization_private) and \
-                self.organizations.filter(id__in=user.profile.organizations.all()).exists():
-            return True
-        if self.is_private and self.private_contestants.filter(id=user.profile.id).exists():
-            return True
-        return False
-
     class Inaccessible(Exception):
         pass
 

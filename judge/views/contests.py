@@ -292,7 +292,8 @@ class ContestJoin(LoginRequiredMixin, ContestMixin, BaseDetailView):
             return generic_message(request, _('Cannot join contest'),
                                    _('Contest %s has ended.') % contest.name)
 
-        if not contest.is_joinable_by(request.user):
+        if contest.is_private_viewable and \
+                not contest.organizations.filter(id__in=profile.organizations.all()).exists():
             return generic_message(request, _('Cannot join contest'),
                                    _('You do not have permission to join: "%s".') % contest.name)
 
