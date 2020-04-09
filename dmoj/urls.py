@@ -11,12 +11,11 @@ from django.views.generic import RedirectView
 from martor.views import markdown_search_user
 
 from judge.forms import CustomAuthenticationForm
-from judge.views import TitledTemplateView, blog, contests, language, organization, \
+from judge.views import blog, contests, language, organization, \
     preview, problem, problem_manage, ranked_submission, status, submission, tasks, ticket, \
     user, widgets
 from judge.views.problem_data import ProblemDataView, ProblemSubmissionDiff, \
     problem_data_file, problem_init_view
-from judge.views.register import ActivationView, RegistrationView
 from judge.views.select2 import AssigneeSelect2View, ContestSelect2View, \
     ContestUserSearchSelect2View, OrganizationSelect2View, ProblemSelect2View, TicketUserSelect2View, \
     UserSearchSelect2View, UserSelect2View
@@ -25,28 +24,6 @@ from judge.views.widgets import martor_image_uploader
 admin.autodiscover()
 
 register_patterns = [
-    url(r'^activate/complete/$',
-        TitledTemplateView.as_view(template_name='registration/activation_complete.html',
-                                   title='Activation Successful!'),
-        name='registration_activation_complete'),
-    # Activation keys get matched by \w+ instead of the more specific
-    # [a-fA-F0-9]{40} because a bad activation key should still get to the view;
-    # that way it can return a sensible "invalid key" message instead of a
-    # confusing 404.
-    url(r'^activate/(?P<activation_key>\w+)/$',
-        ActivationView.as_view(title='Activation key invalid'),
-        name='registration_activate'),
-    url(r'^register/$',
-        RegistrationView.as_view(title='Register'),
-        name='registration_register'),
-    url(r'^register/complete/$',
-        TitledTemplateView.as_view(template_name='registration/registration_complete.html',
-                                   title='Registration Completed'),
-        name='registration_complete'),
-    url(r'^register/closed/$',
-        TitledTemplateView.as_view(template_name='registration/registration_closed.html',
-                                   title='Registration not allowed'),
-        name='registration_disallowed'),
     url(r'^login/$', auth_views.LoginView.as_view(
         template_name='registration/login.html',
         extra_context={'title': _('Login')},
@@ -60,21 +37,6 @@ register_patterns = [
     url(r'^password/change/done/$', auth_views.PasswordChangeDoneView.as_view(
         template_name='registration/password_change_done.html',
     ), name='password_change_done'),
-    url(r'^password/reset/$', auth_views.PasswordResetView.as_view(
-        template_name='registration/password_reset.html',
-        html_email_template_name='registration/password_reset_email.html',
-        email_template_name='registration/password_reset_email.txt',
-    ), name='password_reset'),
-    url(r'^password/reset/confirm/(?P<uidb64>[0-9A-Za-z]+)-(?P<token>.+)/$',
-        auth_views.PasswordResetConfirmView.as_view(
-            template_name='registration/password_reset_confirm.html',
-        ), name='password_reset_confirm'),
-    url(r'^password/reset/complete/$', auth_views.PasswordResetCompleteView.as_view(
-        template_name='registration/password_reset_complete.html',
-    ), name='password_reset_complete'),
-    url(r'^password/reset/done/$', auth_views.PasswordResetDoneView.as_view(
-        template_name='registration/password_reset_done.html',
-    ), name='password_reset_done'),
 ]
 
 
