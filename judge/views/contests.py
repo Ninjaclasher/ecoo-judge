@@ -330,7 +330,7 @@ class ContestJoin(LoginRequiredMixin, ContestMixin, BaseDetailView):
         contest.update_user_count()
 
         first_problem = ContestProblem.objects.all().filter(contest=contest, problem__in=contest.problems.all()) \
-                            .order_by('order').first()
+            .order_by('order').first()
         if not first_problem:
             return HttpResponseRedirect(reverse('problem_list'))
         return HttpResponseRedirect(reverse('problem_detail', args=(first_problem.problem,)))
