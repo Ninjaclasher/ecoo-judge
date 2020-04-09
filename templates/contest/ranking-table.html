@@ -1,19 +1,5 @@
 {% extends "user/base-users-table.html" %}
 
-{% block after_rank_head %}
-    <th class="organization-column">{{ _('Organization') }}</th>
-{% endblock %}
-
-{% block after_rank %}
-    <td class="organization-column">
-        {% if user.organization %}
-            <span class="organization"><a href="{{ user.organization.get_absolute_url() }}">
-                {{- user.organization.short_name -}}
-            </a></span>
-        {% endif %}
-    </td>
-{% endblock %}
-
 {% block user_data %}
     {% if can_edit %}
         <span class="contest-participation-operation">

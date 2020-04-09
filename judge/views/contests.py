@@ -467,14 +467,12 @@ def make_contest_ranking_profile(contest, participation, contest_problems):
 
 def base_contest_ranking_list(contest, problems, queryset):
     return [make_contest_ranking_profile(contest, participation, problems) for participation in
-            queryset.select_related('user__user').defer('user__organizations__about')]
+            queryset.select_related('user__user')]
 
 
 def contest_ranking_list(contest, problems):
     return base_contest_ranking_list(contest, problems, contest.users.filter(virtual=0, user__is_unlisted=False)
-                                     .prefetch_related('user__organizations')
-                                     .annotate(submission_count=Count('submission'))
-                                     .order_by('is_disqualified', '-score', 'cumtime', '-submission_count'))
+                                     .order_by('is_disqualified', '-score', 'cumtime'))
 
 
 def get_contest_ranking_list(request, contest, participation=None, ranking_list=contest_ranking_list,
