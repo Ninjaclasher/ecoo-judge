@@ -88,7 +88,7 @@
                                 {% endif %}
                             </td>
                             <td>
-                                {% if accessible %}
+                                {% if accessible and request.user.is_staff %}
                                     <a href="{{ url('ranked_submissions', problem.code) }}">{{ problem.user_count }}</a>
                                 {% else %}
                                     {{ problem.user_count }}

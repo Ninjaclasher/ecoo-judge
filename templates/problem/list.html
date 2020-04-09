@@ -134,13 +134,13 @@
                             <td class="p">{{ problem.points|floatformat }}{% if problem.partial %}p{% endif %}</td>
                         {% endif %}
                         <td class="users">
-                            <a href="{{ url('ranked_submissions', problem.code) }}">
+                            {% if request.user.is_staff %}<a href="{{ url('ranked_submissions', problem.code) }}">{% endif %}
                                 {% if not request.in_contest or not hide_contest_scoreboard %}
                                     {{ problem.user_count }}
                                 {% else %}
                                     ???
                                 {% endif %}
-                            </a>
+                            {% if request.user.is_staff %}</a>{% endif %}
                         </td>
                     </tr>
                 {% endfor %}
