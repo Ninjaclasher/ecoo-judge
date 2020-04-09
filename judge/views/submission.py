@@ -513,7 +513,7 @@ class ForceContestMixin(object):
     def access_check(self, request):
         super(ForceContestMixin, self).access_check(request)
 
-        if not self.contest.is_editable_by(self.request.user):
+        if not self.contest.can_see_scoreboard(self.request.user):
             raise Http404()
 
     def get(self, request, *args, **kwargs):
