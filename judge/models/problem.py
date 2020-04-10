@@ -173,7 +173,7 @@ class Problem(models.Model):
             q |= Q(testers=user.profile)
             queryset = queryset.filter(q)
 
-        return queryset.distinct()
+        return queryset
 
     @classmethod
     def get_public_problems(cls):
