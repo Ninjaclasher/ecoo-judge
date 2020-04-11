@@ -71,6 +71,8 @@
                 </div>
             {% endif %}
 
+            {% block alerts %}{% endblock %}
+
             <table id="users-table" class="table">
                 {% block users_table %}{% endblock %}
             </table>

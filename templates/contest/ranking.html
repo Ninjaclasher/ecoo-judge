@@ -221,13 +221,14 @@
     {% include "contest/media-js.html" %}
 {% endblock %}
 
-{% block users_table %}
+{% block alerts %}
     <div style="margin-bottom: 0.5em">
-        {% if tab == 'ranking' and contest.freeze_submissions %}
-            <div class="alert alert-warning" style="text-align: center;">
-                {{ _('Scoreboard is frozen for this contest.') }}
-            </div>
+        {% if tab == 'ranking' %}
+            {% include 'contest/freeze-notice.html' %}
         {% endif %}
     </div>
+{% endblock %}
+
+{% block users_table %}
     {% include "contest/ranking-table.html" %}
 {% endblock %}

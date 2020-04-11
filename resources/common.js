@@ -182,7 +182,7 @@ if (!Date.now) {
     };
 }
 
-function count_down(label) {
+function count_down(label, success_func) {
     var initial = parseInt(label.attr('data-secs'));
     var start = Date.now();
 
@@ -196,7 +196,10 @@ function count_down(label) {
         if (time <= 0) {
             clearInterval(timer);
             setTimeout(function() {
-                window.location.reload();
+                if (success_func === undefined)
+                    window.location.reload();
+                else
+                    success_func();
             }, 2000);
         }
         var d = Math.floor(time / 86400);

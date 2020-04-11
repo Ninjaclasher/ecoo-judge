@@ -69,7 +69,7 @@ class ContestForm(ModelForm):
 class ContestAdmin(NoBatchDeleteMixin, VersionAdmin):
     fieldsets = (
         (None, {'fields': ('key', 'name', 'organizers')}),
-        (_('Settings'), {'fields': ('is_visible', 'freeze_submissions', 'hide_scoreboard',
+        (_('Settings'), {'fields': ('is_visible', 'freeze_submissions', 'freeze_after', 'hide_scoreboard',
                                     'permanently_hide_scoreboard', 'run_pretests_only', 'access_code')}),
         (_('Scheduling'), {'fields': ('start_time', 'end_time', 'time_limit')}),
         (_('Details'), {'fields': ('description', 'og_image', 'logo_override_image', 'summary')}),
@@ -100,17 +100,12 @@ class ContestAdmin(NoBatchDeleteMixin, VersionAdmin):
         else:
             return queryset.filter(organizers__id=request.profile.id)
 
-    def get_readonly_fields(self, request, obj=None):
-        readonly = []
-        if obj is not None and obj.freeze_submissions:
-            readonly += ['freeze_submissions']
-        return readonly
-
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
         # We need this flag because `save_related` deals with the inlines, but does not know if we have already rescored
         self._rescored = False
-        if form.changed_data and any(f in form.changed_data for f in ('format_config', 'format_name')):
+        to_check = ('format_config', 'format_name', 'freeze_submissions', 'freeze_after')
+        if form.changed_data and any(f in form.changed_data for f in to_check):
             self._rescore(obj.key)
             self._rescored = True
 
@@ -148,7 +143,6 @@ class ContestAdmin(NoBatchDeleteMixin, VersionAdmin):
     def get_urls(self):
         return [
             url(r'^(\d+)/judge/(\d+)/$', self.rejudge_view, name='judge_contest_rejudge'),
-            url(r'^(\d+)/unfreeze/$', self.unfreeze_view, name='judge_contest_unfreeze'),
         ] + super(ContestAdmin, self).get_urls()
 
     def rejudge_view(self, request, contest_id, problem_id):
@@ -160,18 +154,6 @@ class ContestAdmin(NoBatchDeleteMixin, VersionAdmin):
                                              '%d submissions were successfully scheduled for rejudging.',
                                              len(queryset)) % len(queryset))
         return HttpResponseRedirect(reverse('admin:judge_contest_change', args=(contest_id,)))
-
-    def unfreeze_view(self, request, id):
-        contest = get_object_or_404(Contest, id=id)
-        if not contest.freeze_submissions:
-            raise Http404()
-        with transaction.atomic():
-            contest.freeze_submissions = False
-            contest.save()
-            for submission in ContestSubmission.objects.filter(updated_frozen=True, participation__contest=contest) \
-                                                       .select_related('submission').defer('submission__source'):
-                submission.submission.update_contest()
-        return HttpResponseRedirect(reverse('admin:judge_contest_change', args=(id,)))
 
     def get_form(self, request, obj=None, **kwargs):
         form = super(ContestAdmin, self).get_form(request, obj, **kwargs)

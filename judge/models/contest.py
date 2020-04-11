@@ -62,6 +62,8 @@ class Contest(models.Model):
                                              help_text=_('Whether submission updates should be frozen. If frozen, '
                                                          'rejudging/rescoring will not propagate to related contest '
                                                          'submissions until after this is unchecked.'))
+    freeze_after = models.DateTimeField(verbose_name=_('freeze submissions after'), blank=True, null=True,
+                                        help_text=_('Time at which submissions will be automatically frozen.'))
     organizations = models.ManyToManyField(Organization, blank=True, verbose_name=_('organizations'),
                                            help_text=_('If private, only these organizations may join the contest'))
     og_image = models.CharField(verbose_name=_('OpenGraph image'), default='', max_length=150, blank=True)
@@ -119,6 +121,9 @@ class Contest(models.Model):
             if not isinstance(label, str):
                 raise ValidationError('Contest problem label script: script should return a string.')
 
+        if self.freeze_submissions and not self.freeze_after:
+            raise ValidationError('A freeze_after time must be set if freeze_submissions is set.')
+
     def is_in_contest(self, user):
         if user.is_authenticated:
             profile = user.profile
@@ -169,6 +174,13 @@ class Contest(models.Model):
     def time_before_end(self):
         if self.end_time >= self._now:
             return self.end_time - self._now
+        else:
+            return None
+
+    @property
+    def time_before_freeze(self):
+        if self.freeze_after >= self._now:
+            return self.freeze_after - self._now
         else:
             return None
 

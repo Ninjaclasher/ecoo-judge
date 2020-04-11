@@ -13,16 +13,29 @@ __all__ = ('rescore_contest', 'run_moss')
 @shared_task(bind=True)
 def rescore_contest(self, contest_key):
     contest = Contest.objects.get(key=contest_key)
-    participations = contest.users
 
+    submissions = Submission.objects.filter(contest_object=contest) \
+                                    .select_related('contest', 'contest__participation',
+                                                    'contest__participation__contest', 'contest__problem') \
+                                    .defer('contest__participation__contest__description')
+    recomputed = 0
+    with Progress(self, submissions.count(), stage=_('Recomputing contest submissions')) as p:
+        for submission in submissions.iterator():
+            submission.update_contest()
+            recomputed += 1
+            if recomputed % 10 == 0:
+                p.done = recomputed
+
+    participations = contest.users
     rescored = 0
-    with Progress(self, participations.count(), stage=_('Recalculating contest scores')) as p:
+    with Progress(self, participations.count(), stage=_('Recalculating contest participation scores')) as p:
         for participation in participations.iterator():
             participation.recompute_results()
             rescored += 1
             if rescored % 10 == 0:
                 p.done = rescored
-    return rescored
+
+    return rescored + recomputed
 
 
 @shared_task(bind=True)

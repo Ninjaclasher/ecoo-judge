@@ -301,7 +301,10 @@
             {% include "list-pages.html" %}
         </div>
     {% endif %}
-
+    {% if request.in_contest %}
+        {% set contest=request.participation.contest %}
+        {% include 'contest/freeze-notice.html' %}
+    {% endif %}
     <div id="common-content">
         <div id="content-right" class="submission">
             <div class="info-float">

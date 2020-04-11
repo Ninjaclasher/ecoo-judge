@@ -53,6 +53,9 @@ class ECOOContestFormat(DefaultContestFormat):
 
         submissions = participation.submissions.exclude(submission__result__in=('IE', 'CE'))
 
+        if participation.contest.freeze_submissions:
+            submissions = submissions.filter(submission__date__lt=participation.contest.freeze_after)
+
         submission_counts = {
             data['problem_id']: data['count'] for data in submissions.values('problem_id').annotate(count=Count('id'))
         }

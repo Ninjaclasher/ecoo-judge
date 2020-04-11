@@ -1,0 +1,21 @@
+<script type="text/javascript">
+$(document).ready(function () {
+    $('.time-remaining').each(function () {
+        count_down($(this), function() {
+            $('#freeze-time').text("{{ _('Scoreboard and submissions are frozen.') }}");
+        });
+    });
+});
+</script>
+
+{% if contest.freeze_submissions %}
+    <div class="alert alert-warning" style="text-align: center;">
+        {% if contest.freeze_after < contest._now %}
+            {{ _('Scoreboard and submissions are frozen.') }}
+        {% else %}
+            <span class="time" id="freeze-time">
+                {{ _('Scoreboard and submissions freeze in %(countdown)s', countdown=contest.time_before_freeze|as_countdown) }}
+            </span>
+        {% endif %}
+    </div>
+{% endif %}
