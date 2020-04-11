@@ -228,7 +228,7 @@ class SubmissionsListBase(DiggPaginatorMixin, TitleMixin, ListView):
             queryset = queryset.filter(contest_object_id=self.contest.id)
             if not self.contest.can_see_full_scoreboard(self.request.user):
                 queryset = queryset.filter(user=self.request.profile)
-            if self.contest.freeze_submissions:
+            if self.contest.freeze_submissions and self.request.profile.current_contest.live_or_spectate:
                 queryset = queryset.filter(date__lt=self.contest.freeze_after)
         else:
             queryset = queryset.select_related('contest_object').defer('contest_object__description')

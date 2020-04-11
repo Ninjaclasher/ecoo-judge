@@ -344,6 +344,10 @@ class ContestParticipation(models.Model):
     def spectate(self):
         return self.virtual == self.SPECTATE
 
+    @property
+    def live_or_spectate(self):
+        return self.live or self.spectate
+
     @cached_property
     def start(self):
         contest = self.contest

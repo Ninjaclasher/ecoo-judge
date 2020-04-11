@@ -301,7 +301,7 @@
             {% include "list-pages.html" %}
         </div>
     {% endif %}
-    {% if request.in_contest %}
+    {% if request.in_contest and request.participation.live_or_spectate %}
         {% set contest=request.participation.contest %}
         {% include 'contest/freeze-notice.html' %}
     {% endif %}
