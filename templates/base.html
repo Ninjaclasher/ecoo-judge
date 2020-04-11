@@ -285,7 +285,7 @@
             <form action="{{ url('set_language') }}" method="post" style="display: inline">
                 {% csrf_token %}
             <input name="next" type="hidden" value="{{ request.get_full_path() }}">
-            <select name="language" onchange="form.submit()" style="height: 1.5em">
+            <select name="language" onchange="form.submit()">
                 {% for language in language_info_list(LANGUAGES) %}
                     <option value="{{ language.code }}" {% if language.code == LANGUAGE_CODE %}selected{% endif %}>
                         {{ language.name_local }} ({{ language.code }})
