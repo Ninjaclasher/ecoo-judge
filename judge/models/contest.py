@@ -421,10 +421,6 @@ class ContestSubmission(models.Model):
     is_pretest = models.BooleanField(verbose_name=_('is pretested'),
                                      help_text=_('Whether this submission was ran only on pretests.'),
                                      default=False)
-    updated_frozen = models.BooleanField(verbose_name=_('updated while frozen'),
-                                         help_text=_('Whether this submission was rejudged/rescored '
-                                                     'while the contest was frozen.'),
-                                         default=False)
 
     class Meta:
         verbose_name = _('contest submission')

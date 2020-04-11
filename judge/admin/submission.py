@@ -63,8 +63,7 @@ class SubmissionTestCaseInline(admin.TabularInline):
 
 
 class ContestSubmissionInline(admin.StackedInline):
-    fields = ('problem', 'participation', 'points', 'updated_frozen')
-    readonly_fields = ('updated_frozen',)
+    fields = ('problem', 'participation', 'points')
     model = ContestSubmission
 
     def get_formset(self, request, obj=None, **kwargs):
