@@ -3,8 +3,7 @@ from django.contrib import admin
 from django.db import transaction
 from django.db.models import Q
 from django.forms import ModelForm
-from django.http import Http404, HttpResponseRedirect
-from django.shortcuts import get_object_or_404
+from django.http import HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _, ungettext
