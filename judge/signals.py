@@ -10,7 +10,7 @@ from django.dispatch import receiver
 
 from .caching import finished_submission
 from .models import BlogPost, Contest, ContestSubmission, EFFECTIVE_MATH_ENGINES, Judge, Language, \
-    MiscConfig, Organization, Problem, Profile, Submission
+    MiscConfig, NavigationBar, Organization, Problem, Profile, Submission
 
 
 def get_pdf_path(basename):
@@ -110,6 +110,11 @@ def misc_config_update(sender, instance, **kwargs):
     cache.delete_many(['misc_config:%s:%s:%s' % (domain, lang, instance.key.split('.')[0])
                        for lang in _misc_config_i18n
                        for domain in Site.objects.values_list('domain', flat=True)])
+
+
+@receiver(post_save, sender=NavigationBar)
+def navbar_update(sender, instance, **kwargs):
+    cache.delete('navbar:objects')
 
 
 @receiver(post_save, sender=ContestSubmission)

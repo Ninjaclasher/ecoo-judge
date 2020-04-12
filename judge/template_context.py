@@ -57,10 +57,16 @@ def __nav_tab(path):
 
 
 def general_info(request):
+    cache_key = 'navbar:objects'
+    navbar_objects = cache.get(cache_key)
+    if navbar_objects is None:
+        navbar_objects = NavigationBar.objects.all()
+        cache.set(cache_key, navbar_objects, 7200)
+
     path = request.get_full_path()
     return {
         'nav_tab': FixedSimpleLazyObject(partial(__nav_tab, request.path)),
-        'nav_bar': NavigationBar.objects.all(),
+        'nav_bar': navbar_objects,
         'LOGIN_RETURN_PATH': '' if path.startswith('/accounts/') else path,
         'perms': PermWrapper(request.user),
     }
