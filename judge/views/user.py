@@ -122,12 +122,9 @@ def edit_profile(request):
     else:
         form = ProfileForm(instance=request.profile)
 
-    tzmap = settings.TIMEZONE_MAP
     return render(request, 'user/edit-profile.html', {
         'form': form, 'title': _('Edit profile'),
         'has_math_config': bool(settings.MATHOID_URL),
-        'TIMEZONE_MAP': tzmap or 'http://momentjs.com/static/img/world.png',
-        'TIMEZONE_BG': settings.TIMEZONE_BG if tzmap else '#4E7CAD',
     })
 
 
