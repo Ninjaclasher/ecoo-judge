@@ -1,0 +1,16 @@
+version: '3'
+services:
+  judge:
+    build: .
+    cap_add:
+     - SYS_PTRACE
+    volumes:
+      - ./problems/:/problems/
+      - ./judge.yml:/judge.yml
+      - ./entry:/judge/.docker/entry
+    restart: unless-stopped
+    image: judge
+    environment:
+      - IP=__IP__
+      - PORT=__PORT__
+      - JUDGE_YML=/judge.yml

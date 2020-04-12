@@ -1,0 +1,10 @@
+#!/bin/bash
+
+export DMOJ_IN_DOCKER=1
+export PYTHONUNBUFFERED=1
+export LANG=C.UTF-8
+export PYTHONIOENCODING=utf8
+
+pip3 install -q -e .
+
+runuser -u judge dmoj -- -p $PORT -c $JUDGE_YML --skip-self-test $IP
