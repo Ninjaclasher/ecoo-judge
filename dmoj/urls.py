@@ -17,7 +17,7 @@ from judge.views import blog, contests, language, organization, \
 from judge.views.problem_data import ProblemDataView, ProblemSubmissionDiff, \
     problem_data_file, problem_init_view
 from judge.views.select2 import AssigneeSelect2View, ContestSelect2View, \
-    ContestUserSearchSelect2View, OrganizationSelect2View, ProblemSelect2View, TicketUserSelect2View, \
+    OrganizationSelect2View, ProblemSelect2View, TicketUserSelect2View, \
     UserSearchSelect2View, UserSelect2View
 from judge.views.widgets import martor_image_uploader
 
@@ -168,15 +168,12 @@ urlpatterns = [
         url(r'^rejudge$', widgets.rejudge_submission, name='submission_rejudge'),
         url(r'^single_submission$', submission.single_submission_query, name='submission_single_query'),
         url(r'^submission_testcases$', submission.SubmissionTestCaseQuery.as_view(), name='submission_testcases_query'),
-        url(r'^detect_timezone$', widgets.DetectTimezone.as_view(), name='detect_timezone'),
         url(r'^status-table$', status.status_table, name='status_table'),
 
         url(r'^template$', problem.LanguageTemplateAjax.as_view(), name='language_template_ajax'),
 
         url(r'^select2/', include([
             url(r'^user_search$', UserSearchSelect2View.as_view(), name='user_search_select2_ajax'),
-            url(r'^contest_users/(?P<contest>\w+)$', ContestUserSearchSelect2View.as_view(),
-                name='contest_user_search_select2_ajax'),
             url(r'^ticket_user$', TicketUserSelect2View.as_view(), name='ticket_user_select2_ajax'),
             url(r'^ticket_assignee$', AssigneeSelect2View.as_view(), name='ticket_assignee_select2_ajax'),
         ])),

@@ -1,6 +1,5 @@
 from django.db.models import F, Q
-from django.http import Http404, JsonResponse
-from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
 from django.utils.encoding import smart_text
 from django.views.generic.list import BaseListView
 
@@ -94,16 +93,6 @@ class UserSearchSelect2View(BaseListView):
 
     def get_name(self, obj):
         return str(obj)
-
-
-class ContestUserSearchSelect2View(UserSearchSelect2View):
-    def get_queryset(self):
-        contest = get_object_or_404(Contest, key=self.kwargs['contest'])
-        if not contest.can_see_full_scoreboard(self.request.user):
-            raise Http404()
-
-        return Profile.objects.filter(contest_history__contest=contest,
-                                      user__username__icontains=self.term).distinct()
 
 
 class TicketUserSelect2View(UserSearchSelect2View):
