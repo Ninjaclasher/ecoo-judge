@@ -225,7 +225,7 @@ class SubmissionsListBase(DiggPaginatorMixin, TitleMixin, ListView):
                                                           queryset=ProblemTranslation.objects.filter(
                                                               language=self.request.LANGUAGE_CODE), to_attr='_trans'))
         if self.in_contest:
-            queryset = queryset.filter(contest_object_id=self.contest.id)
+            queryset = queryset.filter(contest_object=self.contest)
             if not self.contest.can_see_full_scoreboard(self.request.user):
                 queryset = queryset.filter(user=self.request.profile)
             try:
@@ -239,11 +239,13 @@ class SubmissionsListBase(DiggPaginatorMixin, TitleMixin, ListView):
 
             if not self.request.user.has_perm('judge.edit_all_contest'):
                 # Show submissions for any contest you can edit, finished, or visible scoreboard
-                contest_queryset = Contest.objects.exclude(Q(organizers=self.request.profile) |
-                                                           Q(end_time__lte=timezone.now(),
-                                                             permanently_hide_scoreboard=False) |
-                                                           Q(hide_scoreboard=False))
-                queryset = queryset.exclude(contest_object__in=contest_queryset)
+                contest_queryset = Contest.objects.filter(Q(organizers=self.request.profile) |
+                                                          Q(end_time__lte=timezone.now(),
+                                                            permanently_hide_scoreboard=False) |
+                                                          Q(hide_scoreboard=False))
+                queryset = queryset.filter(Q(user=self.request.profile) |
+                                           Q(contest_object__in=contest_queryset) |
+                                           Q(contest_object__isnull=True))
 
         if self.selected_languages:
             queryset = queryset.filter(language__in=Language.objects.filter(key__in=self.selected_languages))
