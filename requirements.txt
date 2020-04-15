@@ -30,3 +30,4 @@ celery
 sqlparse
 lupa
 -e git://github.com/DMOJ/martor.git#egg=martor
+netaddr

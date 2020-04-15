@@ -240,9 +240,9 @@ class SubmissionsListBase(DiggPaginatorMixin, TitleMixin, ListView):
             if not self.request.user.has_perm('judge.edit_all_contest'):
                 # Show submissions for any contest you can edit, finished, or visible scoreboard
                 contest_queryset = Contest.objects.filter(Q(organizers=self.request.profile) |
+                                                          Q(hide_scoreboard=False) |
                                                           Q(end_time__lte=timezone.now(),
-                                                            permanently_hide_scoreboard=False) |
-                                                          Q(hide_scoreboard=False))
+                                                            permanently_hide_scoreboard=False)).distinct()
                 queryset = queryset.filter(Q(user=self.request.profile) |
                                            Q(contest_object__in=contest_queryset) |
                                            Q(contest_object__isnull=True))
