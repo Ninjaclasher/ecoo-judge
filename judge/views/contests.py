@@ -431,8 +431,6 @@ ContestRankingProfile = namedtuple(
     'ContestRankingProfile',
     'id user css_class username points cumtime tiebreaker participation '
     'problem_cells result_cell',
-    'id user css_class username points cumtime tiebreaker organization participation '
-    'participation_rating problem_cells result_cell',
 )
 
 
