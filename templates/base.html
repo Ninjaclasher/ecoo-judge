@@ -284,15 +284,18 @@
             {% endif %}
             <form action="{{ url('set_language') }}" method="post" style="display: inline">
                 {% csrf_token %}
-            <input name="next" type="hidden" value="{{ request.get_full_path() }}">
-            <select name="language" onchange="form.submit()">
-                {% for language in language_info_list(LANGUAGES) %}
-                    <option value="{{ language.code }}" {% if language.code == LANGUAGE_CODE %}selected{% endif %}>
-                        {{ language.name_local }} ({{ language.code }})
-                    </option>
-                {% endfor %}
-            </select>
-          </form>
+                <input name="next" type="hidden" value="{{ request.get_full_path() }}">
+                <select name="language" onchange="form.submit()">
+                    {% for language in language_info_list(LANGUAGES) %}
+                        <option value="{{ language.code }}" {% if language.code == LANGUAGE_CODE %}selected{% endif %}>
+                            {{ language.name_local }} ({{ language.code }})
+                        </option>
+                    {% endfor %}
+                </select>
+            </form>
+            {% if request.user.is_staff %}
+                | {{ request.META['uwsgi.node']|decode_utf8 }}
+            {% endif %}
         </span>
     </footer>
 </div>
