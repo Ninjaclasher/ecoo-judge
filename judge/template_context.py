@@ -69,6 +69,7 @@ def general_info(request):
         'nav_bar': navbar_objects,
         'LOGIN_RETURN_PATH': '' if path.startswith('/accounts/') else path,
         'perms': PermWrapper(request.user),
+        'server_name': request.META.get('uwsgi.node', b'').decode('utf-8'),
     }
 
 

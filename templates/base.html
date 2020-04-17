@@ -282,6 +282,9 @@
             {% if i18n_config.footer %}
                 {{ i18n_config.footer|safe }} |
             {% endif %}
+            {% if request.user.is_staff and server_name %}
+                {{ _('Retrieved from: ') }}{{ server_name }} |
+            {% endif %}
             <form action="{{ url('set_language') }}" method="post" style="display: inline">
                 {% csrf_token %}
                 <input name="next" type="hidden" value="{{ request.get_full_path() }}">
@@ -293,9 +296,6 @@
                     {% endfor %}
                 </select>
             </form>
-            {% if request.user.is_staff %}
-                | {{ request.META['uwsgi.node']|decode_utf8 }}
-            {% endif %}
         </span>
     </footer>
 </div>
