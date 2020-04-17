@@ -1,3 +1,4 @@
+import re
 from collections import defaultdict
 from functools import partial
 
@@ -11,11 +12,18 @@ from judge.models import Judge, Language, RuntimeVersion
 __all__ = ['status_all', 'status_table']
 
 
+def sort_by_name_id(judge):
+    sort_list = [not judge.online]
+    convert = (lambda c: int(c) if c.isdigit() else c)
+    sort_list.append(list(map(convert, re.split(r'(\d+)', judge.name))))
+    return sort_list
+
+
 def get_judges(request):
     if request.user.is_superuser or request.user.is_staff:
-        return True, Judge.objects.order_by('-online', 'name')
+        return True, sorted(Judge.objects.all(), key=sort_by_name_id)
     else:
-        return False, Judge.objects.filter(online=True)
+        return False, sorted(Judge.objects.filter(online=True), key=sort_by_name_id)
 
 
 def status_all(request):
