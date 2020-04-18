@@ -10,6 +10,8 @@ services:
       - ./entry:/judge/.docker/entry
     restart: unless-stopped
     image: judge
+    ports:
+      - 9995:9998
     environment:
       - IP=__IP__
       - PORT=__PORT__
