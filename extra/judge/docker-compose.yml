@@ -8,7 +8,7 @@ services:
       - ./problems/:/problems/
       - ./judge.yml:/judge.yml
       - ./entry:/judge/.docker/entry
-    restart: unless-stopped
+    restart: always
     image: judge
     ports:
       - 9995:9998
