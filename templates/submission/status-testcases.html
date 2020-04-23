@@ -55,8 +55,9 @@
             {% endif %}
         <table class="submissions-status-table">{% for case in batch.cases %}
             <tr id="{{ case.id }}" class="case-row toggle closed">
+                {% set print_case_output = case.status != 'AC' and case.output and (prefix_length is none or prefix_length > 0) %}
                 <td>
-                    {%- if case.status != 'AC' and case.output and (prefix_length is none or prefix_length > 0) -%}
+                    {%- if print_case_output or case.extended_feedback -%}
                         <i class="fa fa-chevron-right fa-fw"></i>
                     {%- endif -%}
                     {%- if batch.id -%}
@@ -92,7 +93,6 @@
                 {% endif %}
             </tr>
 
-            {% set print_case_output = case.status != 'AC' and case.output and (prefix_length is none or prefix_length > 0) %}
             {% if print_case_output or case.extended_feedback %}
                 <tr id="{{ case.id }}-output" style="display:none" class="case-feedback toggled">
                     {% if print_case_output %}
