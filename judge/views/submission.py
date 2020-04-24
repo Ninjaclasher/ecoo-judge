@@ -233,7 +233,7 @@ class SubmissionsListBase(DiggPaginatorMixin, TitleMixin, ListView):
             except AttributeError:
                 is_virtual = False
             if self.contest.freeze_submissions and not is_virtual:
-                queryset = queryset.filter(date__lt=self.contest.freeze_after)
+                queryset = queryset.filter(Q(date__lt=self.contest.freeze_after) | Q(user=self.request.profile))
         else:
             queryset = queryset.select_related('contest_object').defer('contest_object__description')
 
