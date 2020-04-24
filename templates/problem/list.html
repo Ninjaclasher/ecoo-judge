@@ -76,7 +76,6 @@
                         {% endif %}
                         <th class="problem">{{ _('Problem') }}</th>
                         <th class="points">{{ _('Points') }}</th>
-                        <th class="users">{{ _('Users') }}</th>
                     {% else %}
                         {% if request.user.is_authenticated %}
                             <th class="solved">
@@ -132,16 +131,13 @@
                         </td>
                         {% if request.in_contest %}
                             <td class="p">{{ problem.points|floatformat }}{% if problem.partial %}p{% endif %}</td>
-                        {% endif %}
-                        <td class="users">
-                            {% if request.user.is_staff %}<a href="{{ url('ranked_submissions', problem.code) }}">{% endif %}
-                                {% if not request.in_contest or not hide_contest_scoreboard %}
+                        {% else %}
+                            <td class="users">
+                                {% if request.user.is_staff %}<a href="{{ url('ranked_submissions', problem.code) }}">{% endif %}
                                     {{ problem.user_count }}
-                                {% else %}
-                                    ???
-                                {% endif %}
-                            {% if request.user.is_staff %}</a>{% endif %}
-                        </td>
+                                {% if request.user.is_staff %}</a>{% endif %}
+                            </td>
+                        {% endif %}
                     </tr>
                 {% endfor %}
                 </tbody>

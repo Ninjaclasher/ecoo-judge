@@ -7,7 +7,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.db import transaction
-from django.db.models import Count, Prefetch
+from django.db.models import Prefetch
 from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.template.loader import get_template
@@ -277,7 +277,6 @@ class ProblemList(QueryStringSortMixin, TitleMixin, SolvedProblemMixin, ListView
     sql_sort = frozenset(('user_count', 'code'))
     manual_sort = frozenset(('name', 'solved'))
     all_sorts = sql_sort | manual_sort
-    default_desc = frozenset(('user_count',))
     default_sort = 'code'
 
     def get_paginator(self, queryset, per_page, orphans=0,
@@ -322,7 +321,6 @@ class ProblemList(QueryStringSortMixin, TitleMixin, SolvedProblemMixin, ListView
     def get_contest_queryset(self):
         queryset = self.profile.current_contest.contest.contest_problems \
             .defer('problem__description').order_by('problem__code') \
-            .annotate(user_count=Count('submission__participation', distinct=True)) \
             .order_by('order')
         queryset = TranslatedProblemForeignKeyQuerySet.add_problem_i18n_name(queryset, 'i18n_name',
                                                                              self.request.LANGUAGE_CODE,
@@ -334,9 +332,8 @@ class ProblemList(QueryStringSortMixin, TitleMixin, SolvedProblemMixin, ListView
             'i18n_name': p['i18n_name'],
             'points': p['points'],
             'partial': p['partial'],
-            'user_count': p['user_count'],
         } for p in queryset.values('problem_id', 'problem__code', 'problem__name', 'i18n_name',
-                                   'points', 'partial', 'user_count')]
+                                   'points', 'partial')]
 
     def get_normal_queryset(self):
         return Problem.get_visible_problems(self.request.user)
