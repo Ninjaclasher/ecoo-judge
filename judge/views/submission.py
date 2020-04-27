@@ -490,8 +490,6 @@ def single_submission_query(request):
 
 
 class AllSubmissions(SubmissionsListBase):
-    stats_update_interval = 3600
-
     def get_my_submissions_page(self):
         if self.request.user.is_authenticated:
             return reverse('all_user_submissions', kwargs={'user': self.request.user.username})
@@ -500,20 +498,7 @@ class AllSubmissions(SubmissionsListBase):
         context = super(AllSubmissions, self).get_context_data(**kwargs)
         context['dynamic_update'] = context['page_obj'].number == 1 and self.request.user.is_staff
         context['last_msg'] = event.last()
-        context['stats_update_interval'] = self.stats_update_interval
         return context
-
-    def _get_result_data(self):
-        if self.in_contest or self.selected_languages or self.selected_statuses:
-            return super(AllSubmissions, self)._get_result_data()
-
-        key = 'global_submission_result_data'
-        result = cache.get(key)
-        if result:
-            return result
-        result = super(AllSubmissions, self)._get_result_data()
-        cache.set(key, result, self.stats_update_interval)
-        return result
 
 
 class ForceContestMixin(object):
