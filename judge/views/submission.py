@@ -5,7 +5,6 @@ from operator import attrgetter
 
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist, PermissionDenied
 from django.db.models import Prefetch, Q
 from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseRedirect, JsonResponse
